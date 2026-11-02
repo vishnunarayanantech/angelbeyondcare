@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Proctor Widget Integration
  * Description: Initializes and persists the proctoring widget across every lesson and quiz chapter of every Tutor LMS course for enrolled (or admin) users, closing the proctoring session on course completion (or, for admins only, an explicit end-session control).
- * Version: 1.7.0
+ * Version: 1.8.0
  *
  * Session-validity note: the vendor exposes no documented API to check
  * whether a session_id is still valid server-side (only client-side
@@ -40,6 +40,23 @@ function pwi_get_setting($name) {
 
 function pwi_is_configured() {
     return pwi_get_setting('key_id') !== '' && pwi_get_setting('app_key') !== '';
+}
+
+/**
+ * A course may have its own dedicated Key ID (meta key below), set from the
+ * courses list on the settings page. When set (and not just whitespace), it
+ * overrides the global Key ID for that course only - everywhere a Key ID is
+ * sent to the proctoring vendor for that course (starting and closing a
+ * session) should resolve it through here rather than reading the global
+ * setting directly. The App Key stays global; only the Key ID is per-course.
+ */
+function pwi_course_key_id_meta_key() {
+    return '_pwi_course_key_id';
+}
+
+function pwi_get_key_id_for_course($course_id) {
+    $override = trim((string) get_post_meta((int) $course_id, pwi_course_key_id_meta_key(), true));
+    return $override !== '' ? $override : pwi_get_setting('key_id');
 }
 
 /**
@@ -117,7 +134,7 @@ function pwi_close_proctor_session($user_id, $course_id) {
     $proctorclosesessionparams = [
         'session_id_or_external' => hash('sha256', $user_id . '_' . $course_id),
         'app_key'                => PWI_APP_KEY,
-        'key_id'                 => PWI_KEY_ID,
+        'key_id'                 => pwi_get_key_id_for_course($course_id),
     ];
 
     $response = wp_remote_post('https://proctoring.api.techversantinfotech.com/proctor-client/session/close', [
@@ -230,7 +247,7 @@ function pwi_render_widget_script($course_id1, $course, $user_id1) {
     $current_user = wp_get_current_user();
 
     $proctorwidgetparams = [
-        'key_id'       => PWI_KEY_ID,
+        'key_id'       => pwi_get_key_id_for_course($course_id1),
         'session_id'   => hash('sha256', $user_id1 . '_' . $course_id1),
         'app_key'      => PWI_APP_KEY,
         'course_id'    => $course_id1,
@@ -527,6 +544,40 @@ function pwi_sanitize_app_key($value) {
     return pwi_sanitize_setting('app_key', 'App Key', $value);
 }
 
+/**
+ * Save per-course Key ID overrides from the courses list on the settings
+ * page. Unlike the global Key ID/App Key, an empty box here is a valid,
+ * deliberate choice (it just means "use the default"), not an error - so a
+ * blank value removes the override instead of being rejected.
+ */
+add_action('admin_post_pwi_save_course_key_ids', function () {
+    if (!current_user_can('manage_options')) {
+        wp_die('Not permitted.', 'Not permitted', ['response' => 403]);
+    }
+
+    $nonce = isset($_POST['pwi_course_key_ids_nonce']) ? sanitize_text_field(wp_unslash($_POST['pwi_course_key_ids_nonce'])) : '';
+    if (!wp_verify_nonce($nonce, 'pwi_save_course_key_ids')) {
+        wp_die('Invalid request.', 'Invalid request', ['response' => 400]);
+    }
+
+    $overrides = (isset($_POST['pwi_course_key_id']) && is_array($_POST['pwi_course_key_id'])) ? $_POST['pwi_course_key_id'] : [];
+    foreach ($overrides as $course_id => $value) {
+        $course_id = (int) $course_id;
+        if (!$course_id) {
+            continue;
+        }
+        $value = trim(sanitize_text_field((string) wp_unslash($value)));
+        if ($value === '') {
+            delete_post_meta($course_id, pwi_course_key_id_meta_key());
+        } else {
+            update_post_meta($course_id, pwi_course_key_id_meta_key(), $value);
+        }
+    }
+
+    wp_safe_redirect(admin_url('admin.php?page=pwi-settings&pwi_course_keys_saved=1'));
+    exit;
+});
+
 function pwi_render_settings_page() {
     if (!current_user_can('manage_options')) {
         return;
@@ -562,10 +613,13 @@ function pwi_render_settings_page() {
 }
 
 /**
- * Read-only list of every Tutor LMS course, shown right under the settings
- * form so an admin can see at a glance what proctoring covers - it applies to
- * all of them (see the intro text above), there is no per-course toggle.
- * Not part of the settings form: nothing here is submitted or saved.
+ * List of every Tutor LMS course, shown right under the settings form so an
+ * admin can see at a glance what proctoring covers - by default all of them,
+ * using the Key ID set above. Each course also has its own Key ID override
+ * box: left blank, the course just uses the default; filled in, that Key ID
+ * is used for that course instead (see pwi_get_key_id_for_course()). This is
+ * its own form (own nonce, posts to admin-post.php), separate from the
+ * Key ID/App Key settings form above it.
  */
 function pwi_render_courses_list() {
     $courses = get_posts([
@@ -578,36 +632,48 @@ function pwi_render_courses_list() {
     $count = count($courses);
     ?>
     <h2>Tutor LMS Courses</h2>
-    <p>Proctoring applies to every course below once a student opens its first lesson.</p>
+    <?php if (isset($_GET['pwi_course_keys_saved'])) : ?>
+        <div class="notice notice-success is-dismissible"><p>Course Key ID overrides saved.</p></div>
+    <?php endif; ?>
+    <p>Proctoring applies to every course below once a student opens its first lesson, using the default Key ID above unless a course has its own Key ID set below.</p>
     <?php if ($count === 0) : ?>
         <p><em>No Tutor LMS courses found yet.</em></p>
     <?php else : ?>
-        <table class="wp-list-table widefat fixed striped">
-            <thead>
-                <tr>
-                    <th style="width:70px;">ID</th>
-                    <th>Course Title</th>
-                    <th style="width:120px;">Status</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php foreach ($courses as $course) : ?>
+        <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
+            <input type="hidden" name="action" value="pwi_save_course_key_ids">
+            <?php wp_nonce_field('pwi_save_course_key_ids', 'pwi_course_key_ids_nonce'); ?>
+            <table class="wp-list-table widefat fixed striped">
+                <thead>
                     <tr>
-                        <td><?php echo (int) $course->ID; ?></td>
-                        <td>
-                            <?php $edit_link = get_edit_post_link($course->ID); ?>
-                            <?php if ($edit_link) : ?>
-                                <a href="<?php echo esc_url($edit_link); ?>"><?php echo esc_html($course->post_title !== '' ? $course->post_title : '(no title)'); ?></a>
-                            <?php else : ?>
-                                <?php echo esc_html($course->post_title !== '' ? $course->post_title : '(no title)'); ?>
-                            <?php endif; ?>
-                        </td>
-                        <td><?php echo esc_html(ucfirst($course->post_status)); ?></td>
+                        <th style="width:70px;">ID</th>
+                        <th>Course Title</th>
+                        <th style="width:120px;">Status</th>
+                        <th style="width:220px;">Key ID override</th>
                     </tr>
-                <?php endforeach; ?>
-            </tbody>
-        </table>
-        <p class="description"><?php echo (int) $count; ?> course<?php echo $count === 1 ? '' : 's'; ?> found.</p>
+                </thead>
+                <tbody>
+                    <?php foreach ($courses as $course) : ?>
+                        <tr>
+                            <td><?php echo (int) $course->ID; ?></td>
+                            <td>
+                                <?php $edit_link = get_edit_post_link($course->ID); ?>
+                                <?php if ($edit_link) : ?>
+                                    <a href="<?php echo esc_url($edit_link); ?>"><?php echo esc_html($course->post_title !== '' ? $course->post_title : '(no title)'); ?></a>
+                                <?php else : ?>
+                                    <?php echo esc_html($course->post_title !== '' ? $course->post_title : '(no title)'); ?>
+                                <?php endif; ?>
+                            </td>
+                            <td><?php echo esc_html(ucfirst($course->post_status)); ?></td>
+                            <td>
+                                <input type="text" class="regular-text code" name="pwi_course_key_id[<?php echo (int) $course->ID; ?>]" value="<?php echo esc_attr(get_post_meta($course->ID, pwi_course_key_id_meta_key(), true)); ?>" placeholder="(using default Key ID)" autocomplete="off">
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+            <p class="description"><?php echo (int) $count; ?> course<?php echo $count === 1 ? '' : 's'; ?> found. Leave a box empty to use the default Key ID above for that course.</p>
+            <?php submit_button('Save Course Key ID Overrides'); ?>
+        </form>
     <?php endif; ?>
     <?php
 }
