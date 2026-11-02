@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Proctor Widget Integration
  * Description: Initializes and persists the proctoring widget across every lesson and quiz chapter of every Tutor LMS course for enrolled (or admin) users, closing the proctoring session on course completion (or, for admins only, an explicit end-session control).
- * Version: 1.6.1
+ * Version: 1.7.0
  *
  * Session-validity note: the vendor exposes no documented API to check
  * whether a session_id is still valid server-side (only client-side
@@ -556,6 +556,58 @@ function pwi_render_settings_page() {
             </table>
             <?php submit_button('Save Changes'); ?>
         </form>
+        <?php pwi_render_courses_list(); ?>
     </div>
+    <?php
+}
+
+/**
+ * Read-only list of every Tutor LMS course, shown right under the settings
+ * form so an admin can see at a glance what proctoring covers - it applies to
+ * all of them (see the intro text above), there is no per-course toggle.
+ * Not part of the settings form: nothing here is submitted or saved.
+ */
+function pwi_render_courses_list() {
+    $courses = get_posts([
+        'post_type'      => 'courses',
+        'post_status'    => ['publish', 'draft', 'pending', 'private', 'future'],
+        'posts_per_page' => -1,
+        'orderby'        => 'title',
+        'order'          => 'ASC',
+    ]);
+    $count = count($courses);
+    ?>
+    <h2>Tutor LMS Courses</h2>
+    <p>Proctoring applies to every course below once a student opens its first lesson.</p>
+    <?php if ($count === 0) : ?>
+        <p><em>No Tutor LMS courses found yet.</em></p>
+    <?php else : ?>
+        <table class="wp-list-table widefat fixed striped">
+            <thead>
+                <tr>
+                    <th style="width:70px;">ID</th>
+                    <th>Course Title</th>
+                    <th style="width:120px;">Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($courses as $course) : ?>
+                    <tr>
+                        <td><?php echo (int) $course->ID; ?></td>
+                        <td>
+                            <?php $edit_link = get_edit_post_link($course->ID); ?>
+                            <?php if ($edit_link) : ?>
+                                <a href="<?php echo esc_url($edit_link); ?>"><?php echo esc_html($course->post_title !== '' ? $course->post_title : '(no title)'); ?></a>
+                            <?php else : ?>
+                                <?php echo esc_html($course->post_title !== '' ? $course->post_title : '(no title)'); ?>
+                            <?php endif; ?>
+                        </td>
+                        <td><?php echo esc_html(ucfirst($course->post_status)); ?></td>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+        <p class="description"><?php echo (int) $count; ?> course<?php echo $count === 1 ? '' : 's'; ?> found.</p>
+    <?php endif; ?>
     <?php
 }
