@@ -1,0 +1,681 @@
+<?php
+/**
+ * Template Class
+ *
+ * @package Tutor\Template
+ * @author Themeum <support@themeum.com>
+ * @link https://themeum.com
+ * @since 1.0.0
+ */
+
+namespace TUTOR;
+
+use Tutor\Helpers\UrlHelper;
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
+/**
+ * Handle template before include
+ *
+ * @since 1.0.0
+ */
+class Template extends Tutor_Base {
+
+	/**
+	 * Page context for the Learning Area theme shell.
+	 *
+	 * @var string
+	 */
+	public const SITE_SHELL_CONTEXT_LEARNING = 'learning';
+
+	/**
+	 * Page context for the Dashboard theme shell.
+	 *
+	 * @var string
+	 */
+	public const SITE_SHELL_CONTEXT_DASHBOARD = 'dashboard';
+
+	/**
+	 * Default selector used to find common theme header markup.
+	 *
+	 * @var string
+	 */
+	private const THEME_HEADER_SELECTOR = 'header[role="banner"], header[role="heading"], header.site-header, header#masthead, #masthead, .site-header, #site-header, header.wp-block-template-part, header.header-sticky, header.has-sticky-header, header.shfb, .shfb-header, .shfb-sticky-header, .ast-primary-header-bar, .main-header-bar, #main-header, .et-l--header, .ct-header, #rs-header, .rs-header, .full-width-header, .header-area, .navbar-area, .ecademy-nav, .edali-nav, .turitor-header, .edubin-header, .edumodo-header, .bb-header, #bb-header, .elementor-location-header, header';
+
+	/**
+	 * Store Shortcode Object
+	 *
+	 * @var Shortcode
+	 */
+	public $shortcode_obj;
+
+	/**
+	 * Get the site-shell state for a Tutor page context.
+	 *
+	 * This is the single source of truth for theme header/footer visibility and
+	 * the browser selector used to measure a rendered theme header.
+	 *
+	 * @since 4.0.7
+	 *
+	 * @param string $context One of the SITE_SHELL_CONTEXT_* constants.
+	 *
+	 * @return array{
+	 *     show_site_header: bool,
+	 *     show_site_footer: bool,
+	 *     has_site_shell: bool,
+	 *     theme_header_selector: string
+	 * }
+	 */
+	public static function get_site_shell_data( string $context ): array {
+		if ( self::SITE_SHELL_CONTEXT_LEARNING === $context ) {
+			$legacy_spotlight_mode = (bool) tutor_utils()->get_option( 'enable_spotlight_mode' );
+			$show_site_header      = (bool) tutor_utils()->get_option( 'show_learning_site_header', ! $legacy_spotlight_mode );
+			$show_site_footer      = (bool) tutor_utils()->get_option( 'show_learning_site_footer', ! $legacy_spotlight_mode );
+		} elseif ( self::SITE_SHELL_CONTEXT_DASHBOARD === $context ) {
+			$show_site_header = (bool) tutor_utils()->get_option( 'show_dashboard_site_header' );
+			$show_site_footer = (bool) tutor_utils()->get_option( 'show_dashboard_site_footer' );
+		} else {
+			return array(
+				'show_site_header'      => false,
+				'show_site_footer'      => false,
+				'has_site_shell'        => false,
+				'theme_header_selector' => '',
+			);
+		}
+
+		$has_site_shell = $show_site_header || $show_site_footer;
+		$selector       = '';
+
+		if ( $show_site_header ) {
+			/**
+			 * Filters the selector used to find a theme header that overlays a Tutor page.
+			 *
+			 * Themes with non-standard header markup can return their exact selector.
+			 * The selector is evaluated in the browser and invalid selectors are ignored.
+			 *
+			 * @since 4.0.6
+			 *
+			 * @param string $selector CSS selector for the active theme header.
+			 */
+			$selector = apply_filters( 'tutor_theme_header_selector', self::THEME_HEADER_SELECTOR );
+			$selector = is_string( $selector ) ? $selector : '';
+		}
+
+		return array(
+			'show_site_header'      => $show_site_header,
+			'show_site_footer'      => $show_site_footer,
+			'has_site_shell'        => $has_site_shell,
+			'theme_header_selector' => $selector,
+		);
+	}
+
+	/**
+	 * Register Hooks
+	 *
+	 * @since 1.0.0
+	 */
+	public function __construct() {
+		parent::__construct();
+
+		/**
+		 * Should Load Template Override
+		 * Integration for specially oxygen builder
+		 * If we found false of below filter, then we will not use this file
+		 */
+
+		$template_override = apply_filters( 'tutor_lms_should_template_override', true );
+		if ( ! $template_override ) {
+			return;
+		}
+
+		add_filter( 'template_include', array( $this, 'load_course_archive_template' ), 99 );
+		add_filter( 'template_include', array( $this, 'load_single_course_template' ), 99 );
+		add_filter( 'template_include', array( $this, 'play_private_video' ), 99 );
+		add_filter( 'tutor_single_content_template', array( $this, 'load_single_lesson_template' ), 99, 2 );
+		add_filter( 'tutor_single_content_template', array( $this, 'load_quiz_template' ), 99, 2 );
+
+		add_filter( 'template_include', array( $this, 'student_public_profile' ), 99 );
+		add_filter( 'template_include', array( $this, 'tutor_dashboard' ), 99 );
+		add_filter( 'pre_get_document_title', array( $this, 'student_public_profile_title' ) );
+
+		add_filter( 'the_content', array( $this, 'convert_static_page_to_template' ) );
+		add_action( 'pre_get_posts', array( $this, 'limit_course_query_archive' ), 99 );
+		add_filter( 'template_include', array( $this, 'load_learning_template' ) );
+
+		$this->shortcode_obj = new Shortcode( false );
+	}
+
+	/**
+	 * Load default template for course
+	 *
+	 * @since v.1.0.0
+	 *
+	 * @param sting $template template name.
+	 *
+	 * @return bool|string
+	 */
+	public function load_course_archive_template( $template ) {
+		global $wp_query;
+
+		$post_type = get_query_var( 'post_type' );
+		if ( ! is_array( $post_type ) ) {
+			$post_type = array( $post_type );
+		}
+
+		$course_category = get_query_var( 'course-category' );
+
+		if ( ( in_array( $this->course_post_type, $post_type, true ) || ! empty( $course_category ) ) && $wp_query->is_archive ) {
+			$template = tutor_get_template( 'archive-course' );
+			return $template;
+		}
+
+		return $template;
+	}
+
+	/**
+	 * Limit for course archive listing
+	 *
+	 * Make a page to archive listing for courses
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param mixed $query query argument.
+	 *
+	 * @return void
+	 */
+	public function limit_course_query_archive( $query ) {
+		$courses_per_page = (int) tutor_utils()->get_option( 'courses_per_page', 12 );
+
+		if ( $query->is_main_query() && ! $query->is_feed() && ! is_admin() && is_page() ) {
+			$queried_object = get_queried_object();
+			if ( $queried_object instanceof \WP_Post ) {
+				$page_id               = $queried_object->ID;
+				$selected_archive_page = (int) apply_filters( 'tutor_filter_course_archive_page', tutor_utils()->get_option( 'course_archive_page' ) );
+
+				if ( $page_id === $selected_archive_page ) {
+					$paged        = ( get_query_var( 'paged' ) ) ? absint( get_query_var( 'paged' ) ) : 1;
+					$search_query = get_search_query();
+					query_posts(
+						array(
+							'post_type'      => $this->course_post_type,
+							'paged'          => $paged,
+							's'              => $search_query,
+							'posts_per_page' => $courses_per_page,
+						)
+					);
+				}
+			}
+		}
+
+		if ( $query->is_archive && $query->is_main_query() && ! $query->is_feed() && ! is_admin() ) {
+			$post_type       = get_query_var( 'post_type' );
+			$course_category = get_query_var( 'course-category' );
+			if ( ( $post_type === $this->course_post_type || ! empty( $course_category ) ) ) {
+				$query->set( 'posts_per_page', $courses_per_page );
+				$query->set( 'post_type', apply_filters( 'tutor_course_archive_post_types', array( $this->course_post_type ) ) );
+				$query = apply_filters( 'tutor_limit_course_archive_list_filter', $query );
+
+				$course_filter = 'newest_first';
+				if ( ! empty( Input::get( 'tutor_course_filter', '' ) ) ) {
+					$course_filter = Input::get( 'tutor_course_filter' );
+				}
+				switch ( $course_filter ) {
+					case 'newest_first':
+						$query->set( 'orderby', 'post_date' );
+						$query->set( 'order', 'desc' );
+						break;
+					case 'oldest_first':
+						$query->set( 'orderby', 'post_date' );
+						$query->set( 'order', 'asc' );
+						break;
+					case 'course_title_az':
+						$query->set( 'orderby', 'post_title' );
+						$query->set( 'order', 'asc' );
+						break;
+					case 'course_title_za':
+						$query->set( 'orderby', 'post_title' );
+						$query->set( 'order', 'desc' );
+						break;
+				}
+			}
+		}
+	}
+
+	/**
+	 * Load Single Course Template
+	 *
+	 * @since v.1.0.0
+	 *
+	 * @param string $template template name to load.
+	 *
+	 * @return bool|string
+	 */
+	public function load_single_course_template( $template ) {
+		global $wp_query;
+		if ( $wp_query->is_single && ! empty( $wp_query->query_vars['post_type'] ) && $wp_query->query_vars['post_type'] === $this->course_post_type ) {
+			// Check if the slug contains subpage of learning area.
+			if ( Input::has( 'subpage' ) ) {
+				$template = tutor_get_template( 'learning-area.index' );
+			} else {
+				do_action( 'single_course_template_before_load', get_the_ID() );
+				wp_reset_query();
+				$template = tutor_get_template( 'single-course' );
+			}
+		}
+
+		return $template;
+	}
+
+	/**
+	 * Get root post parent id
+	 *
+	 * @param int $id post id.
+	 *
+	 * @return int root post id
+	 */
+	private function get_root_post_parent_id( $id ) {
+		$ancestors = get_post_ancestors( $id );
+		$root      = is_array( $ancestors ) ? end( $ancestors ) : null;
+
+		return is_numeric( $root ) ? $root : $id;
+	}
+
+	/**
+	 * Load lesson template
+	 *
+	 * @since v.1.0.0
+	 *
+	 * @since 4.0.0 Post type argument added
+	 *
+	 * @param string $template template name to load.
+	 * @param string $post_type Post type added.
+	 *
+	 * @return bool|string
+	 */
+	public function load_single_lesson_template( $template, $post_type ) {
+		if ( tutor()->lesson_post_type !== $post_type ) {
+			return $template;
+		}
+
+		$is_lesson_post_type = apply_filters( 'tutor_is_lesson_post_type', true, $post_type );
+
+		if ( $is_lesson_post_type ) {
+			$page_id = get_the_ID();
+
+			do_action( 'tutor_lesson_load_before', $template );
+			setup_postdata( $page_id );
+
+			if ( is_user_logged_in() ) {
+				$has_content_access = tutor_utils()->has_enrolled_content_access( 'lesson' );
+				if ( $has_content_access ) {
+					$template = tutor_get_template( 'single-lesson' );
+				} else {
+					$template = tutor_get_template( 'single.lesson.required-enroll' ); // You need to enroll first.
+				}
+			} else {
+				$template = tutor_get_template( 'login' );
+			}
+			wp_reset_postdata();
+
+			// Forcefully show lessons if it is public and not paid.
+			$course_id = $this->get_root_post_parent_id( $page_id );
+			if ( 'yes' === get_post_meta( $course_id, '_tutor_is_public_course', true ) && ! tutor_utils()->is_course_purchasable( $course_id ) ) {
+				$template = tutor_get_template( 'single-lesson' );
+			}
+
+			return apply_filters( 'tutor_lesson_template', $template );
+		}
+
+		return $template;
+	}
+
+	/**
+	 * Play the video in this url.
+	 *
+	 * @param string $template template to load.
+	 *
+	 * @return mixed
+	 */
+	public function play_private_video( $template ) {
+		global $wp_query;
+
+		if ( $wp_query->is_single && ! empty( $wp_query->query_vars['lesson_video'] ) && 'true' === $wp_query->query_vars['lesson_video'] ) {
+
+			$is_public_video = apply_filters( 'tutor_video_stream_is_public', false, get_the_ID() );
+			if ( $is_public_video ) {
+				$video_info = tutor_utils()->get_video_info();
+				if ( $video_info ) {
+					$stream = new Video_Stream( $video_info->path );
+					$stream->start();
+				}
+				exit();
+			}
+
+			if ( tutor_utils()->is_course_enrolled_by_lesson() ) {
+				$video_info = tutor_utils()->get_video_info();
+				if ( $video_info ) {
+					$stream = new Video_Stream( $video_info->path );
+					$stream->start();
+				}
+			} else {
+				esc_html_e( 'Permission denied', 'tutor' );
+			}
+			exit();
+		}
+
+		return $template;
+	}
+
+	/**
+	 * Tutor Dashboard Page, Responsible to show dashboard stuffs
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param string $content page content.
+	 *
+	 * @return mixed
+	 */
+	public function convert_static_page_to_template( $content ) {
+		/**
+		 * Avoid rendering dynamic templates or shortcodes during head generation.
+		 *
+		 * Some plugins (e.g., Yoast SEO) may process `the_content` while generating
+		 * frontend metadata in `wp_head`, which can cause templates or shortcodes
+		 * to be rendered multiple times within the same request.
+		 *
+		 * @since 4.0.0
+		 */
+		if ( ! is_admin() && doing_action( 'wp_head' ) ) {
+			return $content;
+		}
+
+		$page_id = get_the_ID();
+
+		// Dashboard Page.
+		$student_dashboard_page_id = (int) tutor_utils()->get_option( 'tutor_dashboard_page_id' );
+		if ( $page_id === $student_dashboard_page_id ) {
+			return $this->shortcode_obj->tutor_dashboard();
+		}
+
+		// Instructor Registration Page.
+		$instructor_register_page_page_id = (int) tutor_utils()->get_option( 'instructor_register_page' );
+		if ( $page_id === $instructor_register_page_page_id ) {
+			return $this->shortcode_obj->instructor_registration_form();
+		}
+
+		$student_register_page_id = (int) tutor_utils()->get_option( 'student_register_page' );
+		if ( $page_id === $student_register_page_id ) {
+			return $this->shortcode_obj->student_registration_form();
+		}
+
+		if ( tutor_utils()->is_monetize_by_tutor() ) {
+			$tutor_cart_page_id = (int) tutor_utils()->get_option( 'tutor_cart_page_id' );
+			if ( $page_id === $tutor_cart_page_id ) {
+				return $this->shortcode_obj->tutor_cart_page();
+			}
+
+			$tutor_checkout_page_id = (int) tutor_utils()->get_option( 'tutor_checkout_page_id' );
+			if ( $page_id === $tutor_checkout_page_id ) {
+				if ( ! apply_filters( 'tutor_should_load_checkout_page', true ) ) {
+					return '';
+				}
+
+				return $this->shortcode_obj->tutor_checkout_page();
+			}
+		}
+
+		return $content;
+	}
+
+	/**
+	 * Tutor dashboard
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param string $template template name.
+	 *
+	 * @return string
+	 */
+	public function tutor_dashboard( $template ) {
+		global $wp_query;
+		$is_page = apply_filters( 'tutor_determine_is_page', $wp_query->is_page, $template );
+		if ( $is_page ) {
+			$student_dashboard_page_id = (int) tutor_utils()->get_option( 'tutor_dashboard_page_id' );
+			$student_dashboard_page_id = apply_filters( 'tutor_dashboard_page_id_filter', $student_dashboard_page_id );
+			$is_dashboard_page         = apply_filters( 'tutor_determine_is_dashboard_page', get_the_ID() == $student_dashboard_page_id );
+
+			if ( $is_dashboard_page ) {
+				/**
+				 * Handle if logout URL
+				 *
+				 * @since v.1.1.2
+				 */
+				if ( tutor_utils()->array_get( 'tutor_dashboard_page', $wp_query->query_vars ) === 'logout' ) {
+					$redirect = apply_filters( 'tutor_dashboard_logout_redirect_url', get_permalink( $student_dashboard_page_id ) );
+					wp_logout();
+					wp_safe_redirect( $redirect );
+					die();
+				}
+
+				$dashboard_page = tutor_utils()->array_get( 'tutor_dashboard_page', $wp_query->query_vars );
+
+				$get_dashboard_config  = tutor_utils()->tutor_dashboard_permalinks();
+				$target_dashboard_page = tutor_utils()->array_get( $dashboard_page, $get_dashboard_config );
+
+				if ( isset( $target_dashboard_page['login_require'] ) && false === $target_dashboard_page['login_require'] ) {
+					$template = tutor_load_template_part( "template-part.{$dashboard_page}" );
+				} else {
+
+					/**
+					 * Load view page based on dashboard Endpoint
+					 */
+					if ( is_user_logged_in() ) {
+
+						global $wp;
+						$full_path = explode( '/', trim( str_replace( get_home_url(), '', home_url( $wp->request ) ), '/' ) );
+
+						$template = tutor_get_template( 'create-course' === end( $full_path ) ? 'dashboard.create-course' : 'dashboard' );
+
+						/**
+						 * Check page page permission
+						 *
+						 * @since 1.3.4
+						 */
+						$query_var           = tutor_utils()->array_get( 'tutor_dashboard_page', $wp_query->query_vars );
+						$dashboard_pages     = tutor_utils()->tutor_dashboard_pages();
+						$dashboard_page_item = tutor_utils()->array_get( $query_var, $dashboard_pages );
+						$auth_cap            = tutor_utils()->array_get( 'auth_cap', $dashboard_page_item );
+
+						$can_access_instructor_item = tutor()->instructor_role === $auth_cap && User::can_view_instructor_dashboard();
+
+						if ( $auth_cap && ! User::is_admin() && ! current_user_can( $auth_cap ) && ! $can_access_instructor_item
+						) {
+							$template = tutor_get_template( 'permission-denied' );
+						}
+
+						/**
+						 * Account pages of dashboard.
+						 *
+						 * @since 4.0.0
+						 */
+						if ( Dashboard::ACCOUNT_PAGE_SLUG === $dashboard_page ) {
+							$subpage       = tutor_utils()->array_get( 'tutor_dashboard_sub_page', $wp_query->query_vars, 'profile' );
+							$account_pages = Dashboard::get_account_pages();
+							$page_data     = $account_pages[ $subpage ] ?? array();
+							$page_template = $page_data['template'] ?? '';
+
+							if ( file_exists( $page_template ) ) {
+								$template = tutor_get_template( 'account' );
+							}
+						}
+
+						$dashboard_subpage = tutor_utils()->array_get( 'tutor_dashboard_sub_page', $wp_query->query_vars );
+						$is_isolated       = Dashboard::is_isolated_page_request( $dashboard_page, $dashboard_subpage );
+
+						if ( $is_isolated ) {
+							$template = tutor_get_template( 'dashboard-isolated' );
+						}
+					} else {
+						$template = tutor_get_template( 'login' );
+					}
+				}
+			}
+		}
+		return $template;
+	}
+
+	/**
+	 * Load quiz template
+	 *
+	 * @since 1.0.0
+	 *
+	 * If course public then enrollment not required
+	 *
+	 * @since 2.0.2
+	 * @since 4.0.0 $post_type param added.
+	 *
+	 * @param string $template template to load.
+	 * @param string $post_type Post type.
+	 *
+	 * @return bool|string
+	 */
+	public function load_quiz_template( $template, $post_type ) {
+		if ( tutor()->quiz_post_type !== $post_type ) {
+			return $template;
+		}
+
+		global $post;
+
+		if ( is_user_logged_in() ) {
+			$has_content_access = tutor_utils()->has_enrolled_content_access( 'quiz' );
+			$course_id          = tutor_utils()->get_course_id_by_content( $post );
+			$is_public          = Course_List::is_public( $course_id );
+
+			// if public course don't need to be enrolled.
+			if ( $has_content_access || $is_public ) {
+				$template = tutor_get_template( 'single-quiz' );
+			} else {
+				$template = tutor_get_template( 'single.lesson.required-enroll' ); // You need to enroll first.
+			}
+		} else {
+			$template = tutor_get_template( 'login' );
+		}
+
+		return $template;
+	}
+
+	/**
+	 * Student public profile
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param string $template profile template.
+	 *
+	 * @return bool|string
+	 */
+	public function student_public_profile( $template ) {
+		global $wp_query;
+		$query_var = $wp_query->query_vars;
+		if ( ! empty( $wp_query->query['tutor_profile_username'] ) ) {
+			$template = tutor_get_template( 'public-profile' );
+		}
+
+		return $template;
+	}
+
+	/**
+	 * Show student Profile
+	 *
+	 * @since 1.0.0
+	 *
+	 * @return string
+	 */
+	public function student_public_profile_title() {
+		global $wp_query;
+
+		if ( ! empty( $wp_query->query['tutor_profile_username'] ) ) {
+			global $wpdb;
+
+			$user_name = sanitize_text_field( $wp_query->query['tutor_profile_username'] );
+			$user      = $wpdb->get_row( $wpdb->prepare( "SELECT display_name from {$wpdb->users} WHERE user_login = %s limit 1; ", $user_name ) );
+
+			if ( ! empty( $user->display_name ) ) {
+				return sprintf( "%s's %s", $user->display_name, __( 'Profile Page', 'tutor' ) );
+			}
+		}
+		return '';
+	}
+
+	/**
+	 * Load learning template
+	 *
+	 * @since 4.0.0
+	 *
+	 * @param string $template template to load.
+	 *
+	 * @return string
+	 */
+	public function load_learning_template( string $template ): string {
+		if ( tutor_utils()->is_learning_area() ) {
+			$user_id   = get_current_user_id();
+			$post_type = get_post_type();
+			$post_id   = get_the_ID();
+			$course_id = tutor()->course_post_type === $post_type ? $post_id : tutor_utils()->get_course_id_by_subcontent( $post_id );
+			if ( ! in_array( get_post_status( $course_id ), array( 'publish', 'private' ), true ) && ! tutor_utils()->has_user_course_content_access( $user_id, $course_id ) ) {
+				global $wp_query;
+				$wp_query->set_404();
+				status_header( 404 );
+				return get_404_template();
+			}
+
+			$legacy_mode = Options_V2::LEARNING_MODE_LEGACY === tutor_utils()->get_option( 'learning_mode' );
+
+			$template_path = apply_filters( 'tutor_single_content_template', $template, $post_type );
+
+			$template = $legacy_mode ? $template_path : tutor_get_template( 'learning-area.index' );
+		}
+
+		return $template;
+	}
+
+	/**
+	 * Make learning area sub pages nav items
+	 *
+	 * @since 4.0.0
+	 *
+	 * @param string $base_url Nav items base url.
+	 *
+	 * @return array
+	 */
+	public static function make_learning_area_sub_page_nav_items( $base_url = '' ): array {
+		if ( empty( $base_url ) ) {
+			$base_url = get_permalink();
+		}
+
+		$menu_items = apply_filters( 'tutor_learning_area_sub_page_nav_item', array(), $base_url );
+
+		$menu_items['course-info'] = array(
+			'title'    => __( 'Course Info', 'tutor' ),
+			'icon'     => Icon::INFO_OCTAGON,
+			'url'      => UrlHelper::add_query_params( $base_url, array( 'subpage' => 'course-info' ) ),
+			'template' => tutor_get_template( 'learning-area.subpages.course-info' ),
+		);
+
+		return apply_filters( 'tutor_learning_area_sub_page_menu_items', $menu_items, $base_url );
+	}
+
+	/**
+	 * Get learning area active subpage
+	 *
+	 * @since 4.0.0
+	 *
+	 * @return string
+	 */
+	public static function learning_area_active_subpage(): string {
+		$active_menu = Input::get( 'subpage', '' );
+
+		return apply_filters( 'tutor_learning_area_active_subpage', $active_menu );
+	}
+}

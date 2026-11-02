@@ -1,0 +1,891 @@
+/**
+ * HT Mega AI CSS Styles
+ * Enhanced for Multi-Provider Support (OpenAI, Claude, Google AI)
+ * File: admin/assets/css/htmega-ai-integration.css
+ */
+
+/* AI Button in Widget Controls */
+
+.htmega-ai-generate-btn {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+    border: none !important;
+    color: white !important;
+    padding: 3px 5px !important;
+    border-radius: 3px !important;
+    font-size: 11px !important;
+    cursor: pointer !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 5px !important;
+    justify-content: center !important;
+    transition: all 0.3s ease !important;
+    position: relative !important;
+    overflow: hidden !important;
+    min-width: 15px !important;
+}
+
+.htmega-ai-generate-btn:hover {
+    transform: translateY(-1px) !important;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4) !important;
+}
+
+.htmega-ai-generate-btn:active {
+    transform: translateY(0) !important;
+}
+
+.htmega-ai-generate-btn i {
+    font-size: 12px !important;
+    margin-inline-end:0 !important;
+}
+
+.htmega-ai-text {
+    font-weight: 500 !important;
+}
+
+/* Provider-specific button styling */
+.htmega-ai-generate-btn[data-engine="openai"] {
+    background: linear-gradient(135deg, #10a37f 0%, #1a7f64 100%) !important;
+}
+
+.htmega-ai-generate-btn[data-engine="claude"] {
+    background: linear-gradient(135deg, #d4705a 0%, #b85c47 100%) !important;
+}
+
+.htmega-ai-generate-btn[data-engine="google"] {
+    background: linear-gradient(135deg, #4285f4 0%, #34a853 100%) !important;
+}
+
+.htmega-ai-generate-btn[data-engine="openai"]:hover {
+    box-shadow: 0 4px 12px rgba(16, 163, 127, 0.4) !important;
+}
+
+.htmega-ai-generate-btn[data-engine="claude"]:hover {
+    box-shadow: 0 4px 12px rgba(212, 112, 90, 0.4) !important;
+}
+
+.htmega-ai-generate-btn[data-engine="google"]:hover {
+    box-shadow: 0 4px 12px rgba(66, 133, 244, 0.4) !important;
+}
+
+/* Control wrapper */
+.htmega-ai-control-wrapper {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* Button styles */
+.htmega-ai-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    margin-top: 20px;
+}
+
+.htmega-ai-btn {
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 120px;
+}
+
+span.htmega-ai-btn-text {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.htmega-ai-btn-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.htmega-ai-btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    color: #fff;
+}
+
+.htmega-ai-btn-secondary {
+    background: #f8f9fa;
+    color: #444;
+    border: 1px solid #ddd;
+}
+
+.htmega-ai-btn-secondary:hover {
+    background: #eee;
+}
+
+.htmega-ai-loading {
+    display: inline-block;
+    width: 15px;
+    height: 15px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-radius: 50%;
+    border-top-color: #fff;
+    animation: spin 0.8s linear infinite;
+    margin-right: 8px;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Use content button specific styles */
+.htmega-ai-use-content {
+    margin-right: auto;
+}
+
+.elementor-control-type-wysiwyg .htmega-ai-btn-wrapper {
+    display: flex;
+}
+
+.elementor-control-field {
+    gap: 5px;
+}
+
+/* Modal Styles */
+.htmega-ai-modal {
+    background: #fff;
+    border-radius: 14px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    width: 90%;
+    max-width: 600px;
+    max-height: 90vh;
+    margin: 20px auto;
+    position: relative;
+    transform: translateY(0);
+    transition: transform 0.3s ease;
+    animation: modalFadeIn 0.3s ease;
+    font-size: 14px;
+    display: flex;
+}
+
+.htmega-ai-modal-inner {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-height: 90vh;
+}
+
+.htmega-ai-modal-header {
+    padding: 15px 20px;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 14px 14px 0 0;
+    flex-shrink: 0;
+    color: white;
+}
+
+.htmega-ai-modal-header h3 {
+    margin: 0;
+    font-size: 16px;
+    color: white;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.htmega-ai-modal-header h3 i {
+    font-size: 18px;
+}
+
+.htmega-ai-modal-close {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+    padding: 5px;
+    line-height: 1;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: background 0.2s ease;
+}
+
+.htmega-ai-modal-close:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.htmega-ai-modal-content {
+    padding: 25px;
+    max-height: 60vh;
+    overflow-y: auto;
+    flex: 1;
+}
+
+.htmega-ai-modal-footer {
+    padding: 20px 25px;
+    border-top: 1px solid #eee;
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    align-items: center;
+    background: #fff;
+    border-radius: 0 0 14px 14px;
+    flex-shrink: 0;
+}
+
+/* API Configuration Modal */
+.htmega-ai-config-modal {
+    max-width: 500px;
+    display: block;
+}
+
+.htmega-ai-config-modal .htmega-ai-modal-header {
+    background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
+    border-bottom: none;
+}
+
+.htmega-ai-config-modal .htmega-ai-modal-header h3 {
+    color: #fff;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 16px;
+}
+
+.htmega-ai-config-modal .htmega-ai-modal-header h3 i {
+    font-size: 20px;
+}
+
+.htmega-ai-config-message {
+    text-align: center;
+    padding: 20px 0;
+}
+
+.htmega-ai-config-message p {
+    font-size: 15px;
+    color: #444;
+    margin: 0 0 20px;
+    line-height: 22px;
+}
+
+.htmega-ai-config-steps {
+    text-align: left;
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 20px;
+    margin: 0 auto;
+    max-width: 400px;
+}
+
+.htmega-ai-config-steps h4 {
+    margin: 0 0 15px;
+    color: #333;
+    font-size: 15px;
+    font-weight: 500;
+}
+
+.htmega-ai-config-steps ol {
+    margin: 0;
+    padding-left: 20px;
+}
+
+.htmega-ai-config-steps li {
+    margin-bottom: 12px;
+    color: #555;
+    line-height: 1.5;
+}
+
+.htmega-ai-config-steps li:last-child {
+    margin-bottom: 0;
+}
+
+.htmega-ai-config-steps a {
+    color: #4f46e5;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.2s ease;
+}
+
+.htmega-ai-config-steps a:hover {
+    color: #6366f1;
+    text-decoration: underline;
+}
+
+.htmega-ai-config-modal .htmega-ai-modal-footer {
+    border-top: 1px solid #eee;
+    padding: 15px 20px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+/* Form Elements */
+.htmega-ai-field {
+    margin-bottom: 20px;
+}
+
+.htmega-ai-field label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #333;
+}
+
+.htmega-ai-field textarea {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #e1e5e9;
+    border-radius: 6px;
+    font-size: 14px;
+    resize: vertical;
+    transition: border-color 0.2s ease;
+    font-family: inherit;
+}
+
+.htmega-ai-field textarea:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.htmega-ai-current-content {
+    background: #f8f9fa;
+    padding: 12px;
+    border-radius: 6px;
+    border: 1px solid #e9ecef;
+    font-size: 14px;
+    color: #666;
+    max-height: 80px;
+    overflow-y: auto;
+    line-height: 20px;
+}
+
+.htmega-ai-input-group {
+    margin-bottom: 20px;
+}
+
+.htmega-ai-input-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: #444;
+}
+
+.htmega-ai-input-group textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    min-height: 100px;
+    font-size: 14px;
+    transition: border-color 0.2s ease;
+    background: #f8f9fa;
+    color: #515962;
+}
+
+.htmega-ai-input-group textarea:focus {
+    border-color: #667eea;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.htmega-ai-generated-content {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 10px 15px 15px;
+    margin-top: 15px;
+    border: 1px solid #eee;
+}
+
+.htmega-ai-generated-content label {
+    display: block;
+    margin-bottom: 15px;
+    font-weight: 500;
+    color: #444;
+}
+
+.htmega-ai-version-selector {
+    display: flex;
+    gap: 15px 10px;
+    margin: 15px 0;
+    flex-wrap: wrap;
+}
+
+.htmega-ai-version {
+    flex: 1;
+    min-width: 200px;
+    padding: 15px;
+    background: #fff;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.htmega-ai-version-label {
+    display: block;
+    font-size: 11px;
+    color: #667eea;
+    font-weight: 500;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.htmega-ai-version:hover {
+    border-color: #667eea;
+    background: #eef2ff;
+    transform: translateY(-1px);
+}
+
+.htmega-ai-version.selected {
+    border-color: #667eea;
+    background: #eef2ff;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.htmega-ai-version-content {
+    max-height: 100px;
+    overflow-y: auto;
+    line-height: 1.5;
+    font-size: 13px;
+    color: #444;
+    padding-right: 5px;
+}
+
+.htmega-ai-content {
+    background: #fff;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    padding: 20px;
+    line-height: 1.6;
+    color: #333;
+    font-size: 14px;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+/* Scrollbar styling */
+.htmega-ai-version-content::-webkit-scrollbar,
+.htmega-ai-content::-webkit-scrollbar {
+    width: 4px;
+}
+
+.htmega-ai-version-content::-webkit-scrollbar-track,
+.htmega-ai-content::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 2px;
+}
+
+.htmega-ai-version-content::-webkit-scrollbar-thumb,
+.htmega-ai-content::-webkit-scrollbar-thumb {
+    background: #ddd;
+    border-radius: 2px;
+}
+
+.htmega-ai-version-content::-webkit-scrollbar-thumb:hover,
+.htmega-ai-content::-webkit-scrollbar-thumb:hover {
+    background: #ccc;
+}
+
+/* Suggestions */
+.htmega-ai-suggestions {
+    margin-bottom: 20px;
+}
+
+.htmega-ai-suggestion-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.htmega-ai-suggestion-btn {
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    color: #495057;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.htmega-ai-suggestion-btn:hover {
+    background: #e9ecef;
+    border-color: #adb5bd;
+}
+
+.htmega-ai-suggestion-btn:active {
+    background: #667eea;
+    color: white;
+    border-color: #667eea;
+}
+
+/* Modal Footer Buttons */
+.htmega-ai-modal-footer .htmega-ai-btn {
+    margin: 0;
+    padding: 15px 25px;
+    border-radius: 4px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.htmega-ai-modal-footer .htmega-ai-use-content {
+    margin-right: auto;
+    background: linear-gradient(135deg, #667eea 0%, #667eea 100%);
+    border: none;
+    color: white;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.htmega-ai-modal-footer .htmega-ai-use-content:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(102, 126, 234, 0.2);
+    background: linear-gradient(135deg, #5c71d6 0%, #5c71d6 100%);
+}
+
+.htmega-ai-modal-footer .htmega-ai-use-content:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(102, 126, 234, 0.1);
+}
+
+.htmega-ai-modal-footer .htmega-ai-generate {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    color: white;
+}
+
+.htmega-ai-modal-footer .htmega-ai-generate:hover {
+    background: linear-gradient(135deg, #5c71d6 0%, #6a4492 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(102, 126, 234, 0.2);
+}
+
+.htmega-ai-modal-footer .htmega-ai-cancel {
+    background: #f5f5f5;
+    border: 1px solid #ddd;
+    color: #666;
+}
+
+.htmega-ai-modal-footer .htmega-ai-cancel:hover {
+    background: #eeeeee;
+    color: #333;
+}
+
+.htmega-ai-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    backdrop-filter: blur(3px);
+}
+
+@keyframes modalFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Animation classes */
+.htmega-ai-fade-in {
+    animation: fadeIn 0.3s ease;
+}
+
+.htmega-ai-slide-in {
+    animation: slideIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Notification styles */
+.htmega-ai-notice {
+    position: fixed;
+    top: 32px;
+    right: 15px;
+    padding: 12px 20px;
+    border-radius: 4px;
+    background: white;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    z-index: 999999;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 200px;
+    max-width: 400px;
+    animation: slideInNotice 0.3s ease;
+    word-wrap: break-word;
+}
+
+.htmega-ai-notice.success {
+    border-left: 4px solid #4CAF50;
+}
+
+.htmega-ai-notice.error {
+    border-left: 4px solid #f44336;
+}
+
+.htmega-ai-notice .notice-icon {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+}
+
+.htmega-ai-notice.success .notice-icon {
+    color: #4CAF50;
+}
+
+.htmega-ai-notice.error .notice-icon {
+    color: #f44336;
+}
+
+.htmega-ai-notice .notice-message {
+    flex-grow: 1;
+    font-size: 14px;
+    line-height: 1.4;
+    width: 80%;
+    text-align: left;
+}
+
+.htmega-ai-notice .notice-close {
+    color: #999;
+    cursor: pointer;
+    padding: 2px;
+    line-height: 1;
+    font-size: 18px;
+    transition: color 0.2s ease;
+}
+
+.htmega-ai-notice .notice-close:hover {
+    color: #666;
+}
+
+@keyframes slideInNotice {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* Settings Page Styles */
+.htmega-ai-usage-info {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 5px;
+    border-left: 4px solid #007cba;
+    margin-top: 10px;
+}
+
+.htmega-ai-usage-info h4 {
+    margin-top: 0;
+    color: #333;
+}
+
+.htmega-ai-usage-info ul {
+    margin: 10px 0;
+    padding-left: 20px;
+}
+
+.htmega-ai-usage-info li {
+    margin-bottom: 5px;
+}
+
+#htmega-test-ai-connection {
+    background: #007cba;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 13px;
+    transition: background 0.2s ease;
+}
+
+#htmega-test-ai-connection:hover {
+    background: #005a87;
+}
+
+#htmega-test-ai-connection:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+/* Ensure proper spacing in different widget types */
+.elementor-widget-heading .htmega-ai-btn-wrapper,
+.elementor-widget-text-editor .htmega-ai-btn-wrapper,
+.elementor-widget-button .htmega-ai-btn-wrapper {
+    border-top: 1px solid #f0f0f0;
+    padding-top: 8px;
+    margin-top: 12px;
+}
+
+/* Elementor button override css */
+.htmega-ai-modal .elementor-button.elementor-button-success {
+    background-color: #3489FE;
+}
+
+.htmega-ai-modal .elementor-button.elementor-button-success:hover {
+    background-color: #69a5f8;
+}
+
+/* Loading States */
+.htmega-ai-generate-btn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+.eicon-loading.eicon-animation-spin {
+    animation: spin 1s linear infinite;
+}
+
+/* Disabled button states */
+.htmega-ai-modal-close:disabled,
+.htmega-ai-use-content:disabled,
+.htmega-ai-generate-btn:disabled,
+.htmega-ai-cancel:disabled {
+    opacity: 0.6 !important;
+    cursor: not-allowed !important;
+    pointer-events: none !important;
+}
+
+.htmega-ai-generate-btn:disabled .htmega-ai-loading {
+    display: inline-block !important;
+    width: 12px !important;
+    height: 12px !important;
+    border: 2px solid rgba(255, 255, 255, 0.3) !important;
+    border-radius: 50% !important;
+    border-top-color: #fff !important;
+    animation: htmega-ai-spin 1s linear infinite !important;
+    margin-right: 5px !important;
+}
+
+@keyframes htmega-ai-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .htmega-ai-modal {
+        width: 95%;
+        margin: 20px;
+        max-height: 90vh;
+    }
+    
+    .htmega-ai-modal-content {
+        padding: 20px;
+    }
+    
+    .htmega-ai-modal-footer {
+        padding: 15px 20px;
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .htmega-ai-modal-footer .htmega-ai-btn {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .htmega-ai-suggestion-buttons {
+        flex-direction: column;
+    }
+    
+    .htmega-ai-suggestion-btn {
+        text-align: center;
+    }
+    
+    .htmega-ai-version-selector {
+        flex-direction: column;
+    }
+    
+    .htmega-ai-version {
+        min-width: auto;
+    }
+}
+
+/* Integration with Elementor Theme */
+.elementor-panel .htmega-ai-generate-btn {
+    font-family: inherit;
+}
+
+.elementor-panel .htmega-ai-modal {
+    font-family: inherit;
+}
+
+/* Provider indicator for generated content */
+.htmega-ai-provider-badge {
+    display: inline-block;
+    background: #667eea;
+    color: white;
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: 12px;
+    margin-left: 8px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.htmega-ai-provider-badge.openai {
+    background: #10a37f;
+}
+
+.htmega-ai-provider-badge.claude {
+    background: #d4705a;
+}
+
+.htmega-ai-provider-badge.google {
+    background: #4285f4;
+}
+.htmega-ai-version::before {
+    content: "Version " attr(data-version);
+    position: absolute;
+    top: -10px;
+    left: 10px;
+    background: #667eea;
+    color: white;
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 12px;
+}

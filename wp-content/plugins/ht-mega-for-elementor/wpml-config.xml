@@ -1,0 +1,819 @@
+<wpml-config>
+  <admin-texts>
+    <key name="htmega_themebuilder_module_settings">
+        <key name="header_page"/>
+        <key name="footer_page"/>
+        <key name="single_blog_page"/>
+        <key name="archive_blog_page"/>
+        <key name="search_page"/>
+        <key name="error_page"/>
+        <key name="coming_soon_page"/>
+    </key>
+  </admin-texts>
+  <custom-types>
+    <custom-type translate="1">htmega_theme_builder</custom-type>
+  </custom-types>
+  <elementor-widgets>
+    <widget name="htmega-tab-addons">
+      <fields>
+        <field>htmega_tabs_list</field>
+      </fields>
+      <fields-in-item items_of="htmega_tabs_list">
+        <field>tab_title</field>
+       <field>custom_content</field>       
+      </fields-in-item>
+    </widget>
+
+     <widget name="htmega-calendly-addons">
+      <fields>
+        <field>htmega_condition_list</field>
+      </fields>
+      <fields-in-item items_of="htmega_condition_list">
+        
+      </fields-in-item>
+    </widget>
+    <widget name="htmega-audio-player-addons">
+      <fields>
+        <field>htmega_condition_list</field>
+      </fields>
+      <fields-in-item items_of="htmega_condition_list">
+        
+      </fields-in-item>
+    </widget>
+    <widget name="htmega-weather-addons">
+      <fields>
+        <field>htmega_condition_list</field>
+      </fields>
+      <fields-in-item items_of="htmega_condition_list">
+        
+      </fields-in-item>
+    </widget>
+    <widget name="htmega-template-selector">
+      <fields>
+        <field>htmega_condition_list</field>
+      </fields>
+      <fields-in-item items_of="htmega_condition_list">
+        
+      </fields-in-item>
+    </widget>
+    <widget name="htmega-errorcontent-addons">
+      <fields>
+        <field>error_back_button_text</field>
+        <field>htmega_condition_list</field>
+      </fields>
+      <fields-in-item items_of="htmega_condition_list">
+        
+      </fields-in-item>
+    </widget>
+    <widget name="htmega-working-process-addons">
+      <fields>
+        <field>htmega_process_list</field>
+        <field>htmega_condition_list</field>
+      </fields>
+      <fields-in-item items_of="htmega_process_list">
+        <field>process_title</field>
+        <field>process_description</field>
+        
+      </fields-in-item>
+      <fields-in-item items_of="htmega_condition_list">
+        
+      </fields-in-item>
+    </widget>
+    <widget name="htmega-videoplayer-addons">
+      <fields>
+        <field>video_url</field>
+        <field>buttontext</field>
+        <field>htmega_condition_list</field>
+      </fields>
+      <fields-in-item items_of="htmega_condition_list">
+        
+      </fields-in-item>
+    </widget>
+    <widget name="htmega-verticletimeline-addons">
+      <fields>
+        <field>custom_content_list</field>
+        <field>htmega_condition_list</field>
+      </fields>
+      <fields-in-item items_of="custom_content_list">
+        <field>content_date</field>
+        
+      </fields-in-item>
+      <fields-in-item items_of="htmega_condition_list">
+        
+      </fields-in-item>
+    </widget>
+    <widget name="htmega-userregister-form-addons">
+      <fields>
+        <field>register_heading_title</field>
+        <field>register_heading_content</field>
+        <field>register_heading_url_control</field>
+        <field>terms_label</field>
+        <field>username_label</field>
+        <field>password_label</field>
+        <field>email_label</field>
+        <field>firstname_label</field>
+        <field>lastname_label</field>
+        <field>nickname_label</field>
+        <field>website_label</field>
+        <field>bio_label</field>
+        <field>username_placeholder_label</field>
+        <field>password_placeholder_label</field>
+        <field>email_placeholder_label</field>
+        <field>firstname_placeholder_label</field>
+        <field>lastname_placeholder_label</field>
+        <field>nickname_placeholder_label</field>
+        <field>website_placeholder_label</field>
+        <field>bio_placeholder_label</field>
+        <field>submit_button_label</field>
+        <field>or_login_content_text</field>
+        <field>login_button_text</field>
+        <field>required_msg</field>
+        <field>user_length_msg</field>
+        <field>user_exists_msg</field>
+        <field>user_invalid_msg</field>
+        <field>password_length_msg</field>
+        <field>invalid_email_msg</field>
+        <field>email_exists_msg</field>
+        <field>invalid_url_msg</field>
+        <field>success_msg</field>
+        <field>loading_msg</field>
+        <field>server_error_msg</field>
+        <field>login_as_msg</field>
+        <field>htmega_condition_list</field>
+      </fields>
+      <fields-in-item items_of="htmega_condition_list">
+        
+      </fields-in-item>
+    </widget>
+    <widget name="htmega-userlogin-form-addons">
+      <fields>
+        <field>loginform_header_title</field>
+        <field>loginform_heading_content</field>
+        <field>loginform_heading_singup_control</field>
+        <field>htmega_user_label</field>
+        <field>htmega_user_placeholder</field>
+        <field>htmega_password_label</field>
+        <field>htmega_password_placeholder</field>
+        <field>lost_password_label</field>
+        <field>remember_me_label</field>
+        <field>login_button_text</field>
+        <field>invalid_info</field>
+        <field>success_msg</field>
+        <field>loading_msg</field>
+        <field>login_as_msg</field>
+        <field>htmega_condition_list</field>
+      </fields>
+      <fields-in-item items_of="htmega_condition_list">
+        
+      </fields-in-item>
+    </widget>
+    <widget name="htmega-twitterfeed-addons">
+      <fields>
+        <field>htmega_condition_list</field>
+      </fields>
+      <fields-in-item items_of="htmega_condition_list">
+        
+      </fields-in-item>
+    </widget>
+    <widget name="htmega-tooltip-addons">
+      <fields>
+        <field>tooltip_button_txt</field>
+        <field>tooltip_text</field>
+        <field>htmega_condition_list</field>
+      </fields>
+      <fields-in-item items_of="htmega_condition_list">
+        
+      </fields-in-item>
+    </widget>
+    <widget name="htmega-toggle-addons">
+      <fields>
+        <field>toggle_button_normal_title</field>
+        <field>toggle_button_open_title</field>
+        <field>custom_content</field>
+        <field>htmega_condition_list</field>
+      </fields>
+      <fields-in-item items_of="htmega_condition_list">
+        
+      </fields-in-item>
+    </widget>
+    <widget name="htmega-testimonialgrid-addons">
+      <fields>
+        <field>htmega_testimonial_list</field>
+        <field>htmega_condition_list</field>
+      </fields>
+      <fields-in-item items_of="htmega_testimonial_list">
+        <field>client_name</field>
+        <field>client_designation</field>
+        <field>client_say</field>
+        
+      </fields-in-item>
+      <fields-in-item items_of="htmega_condition_list">
+        
+      </fields-in-item>
+    </widget>
+    <widget name="htmega-testimonial-addons">
+      <fields>
+        <field>htmega_testimonial_list</field>
+        <field>htmega_condition_list</field>
+      </fields>
+      <fields-in-item items_of="htmega_testimonial_list">
+        <field>client_name</field>
+        <field>client_designation</field>
+        <field>client_say</field>
+        
+      </fields-in-item>
+      <fields-in-item items_of="htmega_condition_list">
+        
+      </fields-in-item>
+    </widget>
+    <widget name="htmega-team-member-addons">
+      <fields>
+        <field>htmega_member_name</field>
+        <field>htmega_team_member_social_link_list</field>
+        <field>htmega_condition_list</field>
+      </fields>
+      <fields-in-item items_of="htmega_team_member_social_link_list">
+        <field>htmega_social_title</field>
+        <field>htmega_social_link</field>
+        
+      </fields-in-item>
+      <fields-in-item items_of="htmega_condition_list">
+        
+      </fields-in-item>
+    </widget>
+    <widget name="htmega-datatable-addons">
+      <fields>
+        <field>csv_separator</field>
+        <field>google_sheet_range</field>
+        <field>header_column_list</field>
+        <field>content_list</field>
+        <field>display_options</field>
+        <field>show_all_text</field>
+        <field>export_button_text</field>
+        <field>search_label</field>
+        <field>menu_lenght_label</field>
+        <field>paginate_next_label</field>
+        <field>paginate_prev_label</field>
+        <field>paginate_info_label</field>
+        <field>empty_info_label</field>
+        <field>filtered_info_label</field>
+        <field>no_match_info_label</field>
+        <field>htmega_condition_list</field>
+      </fields>
+      <fields-in-item items_of="header_column_list">
+        <field>column_name</field>
+        
+      </fields-in-item>
+      <fields-in-item items_of="content_list">
+        
+        <field>cell_text</field>
+      </fields-in-item>
+      <fields-in-item items_of="htmega_condition_list">
+        
+      </fields-in-item>
+    </widget>
+    <widget name="htmega-switcher-addons">
+      <fields>
+        <field>switch_one_title</field>
+        <field>switch_two_title</field>
+        <field>htmega_condition_list</field>
+      </fields>
+      <fields-in-item items_of="htmega_condition_list">
+        
+      </fields-in-item>
+    </widget>
+    <widget name="htmega-social-shere-addons">
+      <fields>
+        <field>htmega_socialmedia_list</field>
+        <field>htmega_condition_list</field>
+      </fields>
+      <fields-in-item items_of="htmega_socialmedia_list">
+        <field>htmega_social_title</field>
+        
+      </fields-in-item>
+      <fields-in-item items_of="htmega_condition_list">
+        
+      </fields-in-item>
+    </widget>
+    <widget name="htmega-thumbgallery-addons">
+      <fields>
+        <field>slider_list</field>
+        <field>htmega_condition_list</field>
+      </fields>
+      <fields-in-item items_of="slider_list">
+        <field>slider_title</field>
+        
+      </fields-in-item>
+      <fields-in-item items_of="htmega_condition_list">
+        
+      </fields-in-item>
+    </widget>
+    <widget name="htmega-singlepost-addons">
+      <fields>
+        <field>htmega_condition_list</field>
+      </fields>
+      <fields-in-item items_of="htmega_condition_list">
+        
+      </fields-in-item>
+    </widget>
+    <widget name="htmega-service-addons">
+      <fields>
+        <field>htmega_condition_list</field>
+      </fields>
+      <fields-in-item items_of="htmega_condition_list">
+        
+      </fields-in-item>
+    </widget>
+    <widget name="section-title-addons">
+      <fields>
+        <field>section_title_text</field>
+        <field>htmega_condition_list</field>
+      </fields>
+      <fields-in-item items_of="htmega_condition_list">
+        
+      </fields-in-item>
+    </widget>
+    <widget name="htmega-search-addons">
+      <fields>
+        <field>inpur_placeholder</field>
+        <field>search_button_text</field>
+        <field>close_button_text</field>
+        <field>htmega_condition_list</field>
+      </fields>
+      <fields-in-item items_of="htmega_condition_list">
+        
+      </fields-in-item>
+    </widget>
+    <widget name="htmega-scrollnavigation-addons">
+      <fields>
+        <field>navigator_content_list</field>
+        <field>htmega_condition_list</field>
+      </fields>
+      <fields-in-item items_of="navigator_content_list">
+        <field>navigation_content</field>
+        
+      </fields-in-item>
+      <fields-in-item items_of="htmega_condition_list">
+        
+      </fields-in-item>
+    </widget>
+    <widget name="htmega-scrollimage-addons">
+      <fields>
+        <field>htmega_condition_list</field>
+      </fields>
+      <fields-in-item items_of="htmega_condition_list">
+        
+      </fields-in-item>
+    </widget>
+    <widget name="htmega-progressbar-addons">
+      <fields>
+        <field>htmega_progressbar_list</field>
+        <field>htmega_progressbar_list_two</field>
+        <field>htmega_condition_list</field>
+      </fields>
+      <fields-in-item items_of="htmega_progressbar_list">
+        <field>htmega_progressbar_title</field>
+        <field>htmega_progressbar_color</field>
+        <field>htmega_progressbar_value_color</field>
+        
+      </fields-in-item>
+      <fields-in-item items_of="htmega_progressbar_list_two">
+        <field>htmega_progressbar_title</field>
+        
+      </fields-in-item>
+      <fields-in-item items_of="htmega_condition_list">
+        
+      </fields-in-item>
+    </widget>
+    <widget name="htmega-pricing-table-addons">
+      <fields>
+        <field>pricing_badge_title</field>
+        <field>pricing_title</field>
+        <field>htmega_price</field>
+        <field>htmega_period</field>
+        <field>htmega_features_list</field>
+        <field>htmega_button_text</field>
+        <field>htmega_condition_list</field>
+        <field>htmega_show_badge</field>
+        <field>htmega_badge_position</field>
+      </fields>
+      <fields-in-item items_of="htmega_features_list">
+        <field>htmega_features_title</field>
+        
+      </fields-in-item>
+      <fields-in-item items_of="htmega_condition_list">
+        
+      </fields-in-item>
+    </widget>
+    <widget name="htmega-pricinglistview-addons">
+      <fields>
+        <field>pricing_list</field>
+        <field>header_column_list</field>
+        <field>content_list</field>
+        <field>htmega_condition_list</field>
+      </fields>
+      <fields-in-item items_of="pricing_list">
+        <field>list_name</field>
+        <field>list_price</field>
+        
+      </fields-in-item>
+      <fields-in-item items_of="header_column_list">
+        <field>column_name</field>
+        
+      </fields-in-item>
+      <fields-in-item items_of="content_list">
+        
+        <field>cell_text</field>
+      </fields-in-item>
+      <fields-in-item items_of="htmega_condition_list">
+        
+      </fields-in-item>
+    </widget>
+    <widget name="htmega-postslider-addons">
+      <fields>
+        <field>read_more_txt</field>
+        <field>htmega_condition_list</field>
+      </fields>
+      <fields-in-item items_of="htmega_condition_list">
+        
+      </fields-in-item>
+    </widget>
+    <widget name="htmega-postgridtab-addons">
+      <fields>
+        <field>read_more_txt</field>
+        <field>htmega_condition_list</field>
+      </fields>
+      <fields-in-item items_of="htmega_condition_list">
+        
+      </fields-in-item>
+    </widget>
+    <widget name="htmega-postgrid-addons">
+      <fields>
+        <field>read_more_txt</field>
+        <field>show_load_txt</field>
+        <field>htmega_condition_list</field>
+      </fields>
+      <fields-in-item items_of="htmega_condition_list">
+        
+      </fields-in-item>
+    </widget>
+    <widget name="htmega-postcarousel-addons">
+      <fields>
+        <field>read_more_txt</field>
+        <field>htmega_condition_list</field>
+      </fields>
+      <fields-in-item items_of="htmega_condition_list">
+        
+      </fields-in-item>
+    </widget>
+    <widget name="htmega-popover-addons">
+      <fields>
+        <field>popover_button_txt</field>
+        <field>popover_text</field>
+        <field>popover_header_text</field>
+        <field>htmega_condition_list</field>
+      </fields>
+      <fields-in-item items_of="htmega_condition_list">
+        
+      </fields-in-item>
+    </widget>
+    <widget name="htmega-panelslider-addons">
+      <fields>
+        <field>panel_slider_list</field>
+        <field>htmega_condition_list</field>
+      </fields>
+      <fields-in-item items_of="panel_slider_list">
+        <field>slider_title</field>
+        <field>slider_sub_title</field>
+        
+      </fields-in-item>
+      <fields-in-item items_of="htmega_condition_list">
+        
+      </fields-in-item>
+    </widget>
+    <widget name="htmega-offcanvas-addons">
+      <fields>
+        <field>button_text</field>
+        <field>htmega_condition_list</field>
+      </fields>
+      <fields-in-item items_of="htmega_condition_list">
+        
+      </fields-in-item>
+    </widget>
+    <widget name="htmega-notify-addons">
+      <fields>
+        <field>notification_button_txt</field>
+        <field>notification_content</field>
+        <field>htmega_condition_list</field>
+      </fields>
+      <fields-in-item items_of="htmega_condition_list">
+        
+      </fields-in-item>
+    </widget>
+    <widget name="htmega-newtsicker-addons">
+      <fields>
+        <field>htmega_condition_list</field>
+      </fields>
+      <fields-in-item items_of="htmega_condition_list">
+        
+      </fields-in-item>
+    </widget>
+    <widget name="htmega-modal-addons">
+      <fields>
+        <field>modal_header_text</field>
+        <field>modal_footer_text</field>
+        <field>button_text</field>
+        <field>footer_close_txt</field>
+        <field>htmega_condition_list</field>
+      </fields>
+      <fields-in-item items_of="htmega_condition_list">
+        
+      </fields-in-item>
+    </widget>
+    <widget name="htmega-magnific-popup-addons">
+      <fields>
+        <field>zoom_text</field>
+        <field>htmega_condition_list</field>
+      </fields>
+      <fields-in-item items_of="htmega_condition_list">
+        
+      </fields-in-item>
+    </widget>
+    <widget name="htmega-instagram-addons">
+      <fields>
+        <field>flow_button_txt</field>
+        <field>htmega_condition_list</field>
+      </fields>
+      <fields-in-item items_of="htmega_condition_list">
+        
+      </fields-in-item>
+    </widget>
+    <widget name="htmega-inlinemenu-addons">
+      <fields>
+        <field>htmega_condition_list</field>
+      </fields>
+      <fields-in-item items_of="htmega_condition_list">
+        
+      </fields-in-item>
+    </widget>
+    <widget name="htmega-imagemasonryd-addons">
+      <fields>
+        <field>masonrygrid_list</field>
+        <field>htmega_condition_list</field>
+      </fields>
+      <fields-in-item items_of="masonrygrid_list">
+        <field>masonryimage_title</field>
+        <field>masonryimage_description</field>
+        <field>masonryimage_btntxt</field>
+        
+      </fields-in-item>
+      <fields-in-item items_of="htmega_condition_list">
+        
+      </fields-in-item>
+    </widget>
+    <widget name="htmega-imagemarker-addons">
+      <fields>
+        <field>image_marker_list</field>
+        <field>htmega_condition_list</field>
+      </fields>
+      <fields-in-item items_of="image_marker_list">
+        <field>marker_title</field>
+        <field>marker_content</field>
+        <field>marker_x_position>size</field>
+        <field>marker_x_position>unit</field>
+        <field>marker_y_position>size</field>
+        <field>marker_y_position>unit</field>
+        
+        <field>marker_indicator_text</field>
+      </fields-in-item>
+      <fields-in-item items_of="htmega_condition_list">
+        
+      </fields-in-item>
+    </widget>
+    <widget name="htmega-imagemagnifier-addons">
+      <fields>
+        <field>htmega_condition_list</field>
+      </fields>
+      <fields-in-item items_of="htmega_condition_list">
+        
+      </fields-in-item>
+    </widget>
+    <widget name="htmega-imagegrid-addons">
+      <fields>
+        <field>imagegrid_list</field>
+        <field>htmega_condition_list</field>
+      </fields>
+      <fields-in-item items_of="imagegrid_list">
+        <field>gridimage_title</field>
+        <field>gridimage_description</field>
+        <field>gridimage_btntxt</field>
+        
+      </fields-in-item>
+      <fields-in-item items_of="htmega_condition_list">
+        
+      </fields-in-item>
+    </widget>
+    <widget name="htmega-imagecomparison-addons">
+      <fields>
+        <field>htmega_condition_list</field>
+      </fields>
+      <fields-in-item items_of="htmega_condition_list">
+        
+      </fields-in-item>
+    </widget>
+    <widget name="htmega-google-map-addons">
+      <fields>
+        <field>htmega_center_address</field>
+        <field>htmega_map_marker_list</field>
+        <field>htmega_fixed_address</field>
+        <field>htmega_condition_list</field>
+      </fields>
+      <fields-in-item items_of="htmega_map_marker_list">
+        <field>marker_title</field>
+        <field>marker_lat</field>
+        <field>marker_lng</field>
+        
+      </fields-in-item>
+      <fields-in-item items_of="htmega_condition_list">
+        
+      </fields-in-item>
+    </widget>
+    <widget name="htmega-galleryjustify-addons">
+      <fields>
+        <field>htmega_condition_list</field>
+      </fields>
+      <fields-in-item items_of="htmega_condition_list">
+        
+      </fields-in-item>
+    </widget>
+    <widget name="htmega-dropcaps-addons">
+      <fields>
+        <field>dropcaps_text</field>
+        <field>htmega_condition_list</field>
+      </fields>
+      <fields-in-item items_of="htmega_condition_list">
+        
+      </fields-in-item>
+    </widget>
+    <widget name="htmega-dualbutton-addons">
+      <fields>
+        <field>button_middle_text</field>
+        <field>button_one_text</field>
+        <field>button_two_text</field>
+        <field>htmega_condition_list</field>
+      </fields>
+      <fields-in-item items_of="htmega_condition_list">
+        
+      </fields-in-item>
+    </widget>
+    <widget name="htmega-customevent-addons">
+      <fields>
+        <field>htmega_condition_list</field>
+      </fields>
+      <fields-in-item items_of="htmega_condition_list">
+        
+      </fields-in-item>
+    </widget>
+    <widget name="htmega-counter-addons">
+      <fields>
+        <field>counter_title</field>
+        <field>htmega_condition_list</field>
+      </fields>
+      <fields-in-item items_of="htmega_condition_list">
+        
+      </fields-in-item>
+    </widget>
+    <widget name="htmega-countdown-addons">
+      <fields>
+        <field>button_text</field>
+        <field>htmega_condition_list</field>
+      </fields>
+      <fields-in-item items_of="htmega_condition_list">
+        
+      </fields-in-item>
+    </widget>
+    <widget name="htmega-carousel-addons">
+      <fields>
+        <field>carosul_image_list</field>
+        <field>htmega_condition_list</field>
+      </fields>
+      <fields-in-item items_of="carosul_image_list">
+        <field>carosul_image_title</field>
+        
+      </fields-in-item>
+      <fields-in-item items_of="htmega_condition_list">
+        
+      </fields-in-item>
+    </widget>
+    <widget name="htmega-calltoaction-addons">
+      <fields>
+        <field>callto_action_title</field>
+        <field>callto_action_description</field>
+        <field>callto_action_buttontxt</field>
+        <field>htmega_condition_list</field>
+      </fields>
+      <fields-in-item items_of="htmega_condition_list">
+        
+      </fields-in-item>
+    </widget>
+    <widget name="htmega-button-addons">
+      <fields>
+        <field>button_text</field>
+        <field>htmega_condition_list</field>
+      </fields>
+      <fields-in-item items_of="htmega_condition_list">
+        
+      </fields-in-item>
+    </widget>
+    <widget name="htmega-businesshours-addons">
+      <fields>
+        <field>business_hour_title</field>
+        <field>business_openday_list</field>
+        <field>htmega_condition_list</field>
+      </fields>
+      <fields-in-item items_of="business_openday_list">
+        <field>business_day</field>
+        <field>business_time</field>
+        
+      </fields-in-item>
+      <fields-in-item items_of="htmega_condition_list">
+        
+      </fields-in-item>
+    </widget>
+    <widget name="htmega-brand-addons">
+      <fields>
+        <field>htmega_brand_list</field>
+        <field>htmega_condition_list</field>
+      </fields>
+      <fields-in-item items_of="htmega_brand_list">
+        <field>htmega_brand_title</field>
+        <field>htmega_brand_link</field>
+        
+      </fields-in-item>
+      <fields-in-item items_of="htmega_condition_list">
+        
+      </fields-in-item>
+    </widget>
+    <widget name="htmega-blockquote-addons">
+      <fields>
+        <field>blockquote_by</field>
+        <field>htmega_condition_list</field>
+      </fields>
+      <fields-in-item items_of="htmega_condition_list">
+        
+      </fields-in-item>
+    </widget>
+    <widget name="htmega-specialdaybanner-addons">
+      <fields>
+        <field>htmega_condition_list</field>
+      </fields>
+      <fields-in-item items_of="htmega_condition_list">
+        
+      </fields-in-item>
+    </widget>
+    <widget name="htmega-addbanner-addons">
+      <fields>
+        <field>htmega_condition_list</field>
+      </fields>
+      <fields-in-item items_of="htmega_condition_list">
+        
+      </fields-in-item>
+    </widget>
+    <widget name="htmega-animatedheading-addons">
+      <fields>
+        <field>animated_before_text</field>
+        <field>animated_heading_text</field>
+        <field>htmega_condition_list</field>
+      </fields>
+      <fields-in-item items_of="htmega_condition_list">
+        
+      </fields-in-item>
+    </widget>
+    <widget name="htmega-accordion-addons">
+      <fields>
+        <field>htmega_accordion_list</field>
+        <field>htmega_accordion_list_two</field>
+        <field>htmega_accordion_list_three</field>
+        <field>htmega_condition_list</field>
+      </fields>
+      <fields-in-item items_of="htmega_accordion_list">
+        <field>accordion_title</field>
+        <field>accordion_content</field>
+        
+      </fields-in-item>
+      <fields-in-item items_of="htmega_accordion_list_two">
+        <field>accordion_title</field>
+        
+      </fields-in-item>
+      <fields-in-item items_of="htmega_accordion_list_three">
+        <field>accordion_title</field>
+        <field>accordion_content</field>
+        
+      </fields-in-item>
+      <fields-in-item items_of="htmega_condition_list">
+        
+      </fields-in-item>
+    </widget>
+
+  </elementor-widgets>
+</wpml-config>

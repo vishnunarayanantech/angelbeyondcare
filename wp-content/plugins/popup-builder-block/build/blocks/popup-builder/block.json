@@ -1,0 +1,595 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "popup-builder-block/popup-builder",
+  "version": "1.0.0",
+  "title": "Popup Builder",
+  "category": "popup-builder-block",
+  "keywords": [
+    "popup",
+    "popup builder",
+    "popup block",
+    "popup editor",
+    "popup gutenberg",
+    "modal"
+  ],
+  "description": "Popup block for Popup Builder Block.",
+  "example": {
+    "attributes": {
+      "preview": true
+    }
+  },
+  "attributes": {
+    "blockID": {
+      "type": "string"
+    },
+    "blockClass": {
+      "type": "string"
+    },
+    "blocksCSS": {
+      "type": "object"
+    },
+    "postId": {
+      "type": "number"
+    },
+    "campaignType": {
+      "type": "string",
+      "default": "popup"
+    },
+    "floatingBarPosition": {
+      "type": "string",
+      "default": "bottom"
+    },
+    "variationSeleted": {
+      "type": "boolean",
+      "default": false
+    },
+    "variationType": {
+      "type": "string"
+    },
+    "entrAnimation": {
+      "type": "string",
+      "default": "fadeIn"
+    },
+    "exitAnimation": {
+      "type": "string",
+      "default": "fadeIn"
+    },
+    "openTrigger": {
+      "type": "string",
+      "default": "page-load"
+    },
+    "displayConditions": {
+      "type": "array",
+      "default": [
+        {
+          "archive": "archive-all",
+          "archive-author": "all",
+          "archive-category": "all",
+          "archive-tag": "all",
+          "chosen": false,
+          "condition": "include",
+          "pageType": "entire-site",
+          "singular": "singular-front-page",
+          "singular-page": [],
+          "singular-page-child": [],
+          "singular-page-template": "all",
+          "singular-post": [],
+          "singular-post-cat": [],
+          "singular-post-tag": []
+        }
+      ]
+    },
+    "geoTargets": {
+      "type": "array",
+      "default": []
+    },
+    "preventScroll": {
+      "type": "boolean",
+      "default": false
+    },
+    "popupkitBadge": {
+      "type": "boolean",
+      "default": false
+    },
+    "pageLoadDelay": {
+      "type": "number",
+      "default": 1
+    },
+    "scrolledToValue": {
+      "type": "number",
+      "default": 30
+    },
+    "userInactivityTime": {
+      "type": "number",
+      "default": 3
+    },
+    "timeZone": {
+      "type": "string",
+      "default": "siteTimeZone"
+    },
+    "onDateValue": {
+      "type": "string"
+    },
+    "offDateValue": {
+      "type": "string"
+    },
+    "customSelector": {
+      "type": "string"
+    },
+    "scheduleDateTime": {
+      "type": "boolean",
+      "default": false
+    },
+    "displayDevice": {
+      "type": "object",
+      "default": {
+        "desktop": true,
+        "tablet": true,
+        "mobile": true
+      }
+    },
+    "userInfo": {
+      "type": "array",
+      "default": [
+        {
+          "label": "Device",
+          "value": "device"
+        }
+      ]
+    },
+    "displayVisitor": {
+      "type": "string",
+      "default": "everyone"
+    },
+    "displayVisitorConvertion": {
+      "type": "boolean",
+      "default": true
+    },
+    "displayFrequency": {
+      "type": "string",
+      "default": "once-a-day"
+    },
+    "displayFrequencyVisits": {
+      "type": "number",
+      "default": 2
+    },
+    "returningVisitorDays": {
+      "type": "number",
+      "default": 2
+    },
+    "newVisitorDays": {
+      "type": "number",
+      "default": 2
+    },
+    "displayFrequencyDays": {
+      "type": "number",
+      "default": 2
+    },
+    "animationDuration": {
+      "type": "number",
+      "default": 0.5
+    },
+    "containerWidthDesktop": {
+      "type": "object"
+    },
+    "containerWidthTablet": {
+      "type": "object"
+    },
+    "containerWidthMobile": {
+      "type": "object"
+    },
+    "containerWidthTabletLandscape": {
+      "type": "object"
+    },
+    "containerWidthMobileLandscape": {
+      "type": "object"
+    },
+    "containerWidthLaptop": {
+      "type": "object"
+    },
+    "containerWidthWideScreen": {
+      "type": "object"
+    },
+    "containerCustomHeightDesktop": {
+      "type": "object"
+    },
+    "containerCustomHeightTablet": {
+      "type": "object"
+    },
+    "containerCustomHeightMobile": {
+      "type": "object"
+    },
+    "containerCustomHeightTabletLandscape": {
+      "type": "object"
+    },
+    "containerCustomHeightMobileLandscape": {
+      "type": "object"
+    },
+    "containerCustomHeightLaptop": {
+      "type": "object"
+    },
+    "containerCustomHeightWideScreen": {
+      "type": "object"
+    },
+    "containerHeight": {
+      "type": "string",
+      "default": "auto"
+    },
+    "contentPosition": {
+      "type": "string"
+    },
+    "containerHorPositionDesktop": {
+      "type": "string"
+    },
+    "containerHorPositionTablet": {
+      "type": "string"
+    },
+    "containerHorPositionMobile": {
+      "type": "string"
+    },
+    "containerHorPositionTabletLandscape": {
+      "type": "string"
+    },
+    "containerHorPositionMobileLandscape": {
+      "type": "string"
+    },
+    "containerHorPositionLaptop": {
+      "type": "string"
+    },
+    "containerHorPositionWideScreen": {
+      "type": "string"
+    },
+    "containerVerPositionDesktop": {
+      "type": "string"
+    },
+    "containerVerPositionTablet": {
+      "type": "string"
+    },
+    "containerVerPositionMobile": {
+      "type": "string"
+    },
+    "containerVerPositionTabletLandscape": {
+      "type": "string"
+    },
+    "containerVerPositionMobileLandscape": {
+      "type": "string"
+    },
+    "containerVerPositionLaptop": {
+      "type": "string"
+    },
+    "containerVerPositionWideScreen": {
+      "type": "string"
+    },
+    "containerBg": {
+      "type": "object"
+    },
+    "containerPaddingDesktop": {
+      "type": "object",
+      "default": {
+        "top": "20px",
+        "right": "20px",
+        "bottom": "20px",
+        "left": "20px"
+      }
+    },
+    "containerPaddingTablet": {
+      "type": "object"
+    },
+    "containerPaddingMobile": {
+      "type": "object"
+    },
+    "containerPaddingTabletLandscape": {
+      "type": "object"
+    },
+    "containerPaddingMobileLandscape": {
+      "type": "object"
+    },
+    "containerPaddingLaptop": {
+      "type": "object"
+    },
+    "containerPaddingWideScreen": {
+      "type": "object"
+    },
+    "containerMarginDesktop": {
+      "type": "object"
+    },
+    "containerMarginTablet": {
+      "type": "object"
+    },
+    "containerMarginMobile": {
+      "type": "object"
+    },
+    "containerMarginTabletLandscape": {
+      "type": "object"
+    },
+    "containerMarginMobileLandscape": {
+      "type": "object"
+    },
+    "containerMarginLaptop": {
+      "type": "object"
+    },
+    "containerMarginWideScreen": {
+      "type": "object"
+    },
+    "containerBorder": {
+      "type": "object"
+    },
+    "containerBorderRadiusDesktop": {
+      "type": "object"
+    },
+    "containerBorderRadiusTablet": {
+      "type": "object"
+    },
+    "containerBorderRadiusMobile": {
+      "type": "object"
+    },
+    "containerBorderRadiusTabletLandscape": {
+      "type": "object"
+    },
+    "containerBorderRadiusMobileLandscape": {
+      "type": "object"
+    },
+    "containerBorderRadiusLaptop": {
+      "type": "object"
+    },
+    "containerBorderRadiusWideScreen": {
+      "type": "object"
+    },
+    "containerBoxShadow": {
+      "type": "object",
+      "default": {
+        "horizontal": {
+          "size": 2
+        },
+        "vertical": {
+          "size": 8
+        },
+        "blur": {
+          "size": 23
+        },
+        "spread": {
+          "size": 3
+        },
+        "color": "#00000033",
+        "hasValue": true
+      }
+    },
+    "closeButtonBoxShadow": {
+      "type": "object"
+    },
+    "closeButtonHoverBoxShadow": {
+      "type": "object"
+    },
+    "popupStyles": {
+      "type": "object"
+    },
+    "useOverlay": {
+      "type": "boolean",
+      "default": true
+    },
+    "slidInHorizontalPosition": {
+      "type": "string",
+      "default": "right"
+    },
+    "slidInVerticalPosition": {
+      "type": "string",
+      "default": "bottom"
+    },
+    "outsideClose": {
+      "type": "boolean",
+      "default": false
+    },
+    "overlayBg": {
+      "type": "object",
+      "default": {
+        "backgroundType": "classic",
+        "backgroundColor": "#00000050"
+      }
+    },
+    "overlayFullScreenBg": {
+      "type": "object",
+      "default": {
+        "backgroundType": "classic",
+        "backgroundColor": "#00000050"
+      }
+    },
+    "useCloseButton": {
+      "type": "boolean",
+      "default": true
+    },
+    "useCloseButtonIcon": {
+      "type": "boolean",
+      "default": false
+    },
+    "useCustomPosition": {
+      "type": "boolean",
+      "default": false
+    },
+    "closeButtonIcon": {
+      "type": "object",
+      "default": {
+        "title": "cancel",
+        "src": "<svg version=\"1.1\" xmlns=\"http://www.w3.org/2000/svg\" width=\"32\" height=\"32\" viewBox=\"0 0 32 32\">\n<title>cancel</title>\n<path d=\"M18.556 16.027l12.169-12.169c0.706-0.706 0.706-1.85 0-2.555s-1.851-0.706-2.555 0l-12.169 12.169-12.167-12.169c-0.705-0.706-1.85-0.706-2.555 0s-0.706 1.85 0 2.555l12.167 12.169-12.915 12.915c-0.706 0.706-0.706 1.85 0 2.555 0.352 0.353 0.815 0.53 1.278 0.53s0.925-0.176 1.278-0.53l12.915-12.915 12.915 12.915c0.353 0.353 0.815 0.53 1.278 0.53s0.924-0.176 1.278-0.53c0.706-0.706 0.706-1.85 0-2.555l-12.915-12.915z\"></path>\n</svg>\n"
+      },
+      "excludeCopy": true
+    },
+    "closeButtonColor": {
+      "type": "string"
+    },
+    "closeButtonColorHover": {
+      "type": "string"
+    },
+    "closeButtonSize": {
+      "type": "object"
+    },
+    "closeButtonBg": {
+      "type": "string"
+    },
+    "closeButtonBgHover": {
+      "type": "string"
+    },
+    "closeButtonBorder": {
+      "type": "object"
+    },
+    "closeButtonBorderHover": {
+      "type": "object"
+    },
+    "closeButtonBorderRadiusDesktop": {
+      "type": "object"
+    },
+    "closeButtonBorderRadiusTablet": {
+      "type": "object"
+    },
+    "closeButtonBorderRadiusMobile": {
+      "type": "object"
+    },
+    "closeButtonBorderRadiusTabletLandscape": {
+      "type": "object"
+    },
+    "closeButtonBorderRadiusMobileLandscape": {
+      "type": "object"
+    },
+    "closeButtonBorderRadiusLaptop": {
+      "type": "object"
+    },
+    "closeButtonBorderRadiusWideScreen": {
+      "type": "object"
+    },
+    "closeButtonVerticalPositionDesktop": {
+      "type": "object"
+    },
+    "closeButtonVerticalPositionTablet": {
+      "type": "object"
+    },
+    "closeButtonVerticalPositionMobile": {
+      "type": "object"
+    },
+    "closeButtonVerticalPositionTabletLandscape": {
+      "type": "object"
+    },
+    "closeButtonVerticalPositionMobileLandscape": {
+      "type": "object"
+    },
+    "closeButtonVerticalPositionLaptop": {
+      "type": "object"
+    },
+    "closeButtonVerticalPositionWideScreen": {
+      "type": "object"
+    },
+    "floatingBarOffsetDesktop": {
+      "type": "object"
+    },
+    "floatingBarOffsetTablet": {
+      "type": "object"
+    },
+    "floatingBarOffsetMobile": {
+      "type": "object"
+    },
+    "floatingBarOffsetTabletLandscape": {
+      "type": "object"
+    },
+    "floatingBarOffsetMobileLandscape": {
+      "type": "object"
+    },
+    "floatingBarOffsetLaptop": {
+      "type": "object"
+    },
+    "floatingBarOffsetWideScreen": {
+      "type": "object"
+    },
+    "closeButtonHorizontalPositionDesktop": {
+      "type": "object"
+    },
+    "closeButtonHorizontalPositionTablet": {
+      "type": "object"
+    },
+    "closeButtonHorizontalPositionMobile": {
+      "type": "object"
+    },
+    "closeButtonHorizontalPositionTabletLandscape": {
+      "type": "object"
+    },
+    "closeButtonHorizontalPositionMobileLandscape": {
+      "type": "object"
+    },
+    "closeButtonHorizontalPositionLaptop": {
+      "type": "object"
+    },
+    "closeButtonHorizontalPositionWideScreen": {
+      "type": "object"
+    },
+    "closeButtonSizeDesktop": {
+      "type": "object"
+    },
+    "closeButtonSizeTablet": {
+      "type": "object"
+    },
+    "closeButtonSizeMobile": {
+      "type": "object"
+    },
+    "closeButtonSizeTabletLandscape": {
+      "type": "object"
+    },
+    "closeButtonSizeMobileLandscape": {
+      "type": "object"
+    },
+    "closeButtonSizeLaptop": {
+      "type": "object"
+    },
+    "closeButtonSizeWideScreen": {
+      "type": "object"
+    },
+    "closeButtonPaddingDesktop": {
+      "type": "object"
+    },
+    "closeButtonPaddingTablet": {
+      "type": "object"
+    },
+    "closeButtonPaddingMobile": {
+      "type": "object"
+    },
+    "closeButtonPaddingTabletLandscape": {
+      "type": "object"
+    },
+    "closeButtonPaddingMobileLandscape": {
+      "type": "object"
+    },
+    "closeButtonPaddingLaptop": {
+      "type": "object"
+    },
+    "closeButtonPaddingWideScreen": {
+      "type": "object"
+    },
+    "showContainerOverlay": {
+      "type": "boolean",
+      "default": false
+    },
+    "containerBackgroundOverlay": {
+      "type": "object"
+    },
+    "containerBackgroundHoverOverlay": {
+      "type": "object"
+    },
+    "closeButtonPosition": {
+      "type": "string",
+      "default": "inside"
+    }
+  },
+  "usesContext": [
+    "postType",
+    "postId"
+  ],
+  "supports": {
+    "html": false,
+    "align": [
+      "wide",
+      "full"
+    ]
+  },
+  "textdomain": "popup-builder-block",
+  "editorScript": "file:./index.js",
+  "editorStyle": "file:./index.css",
+  "style": "file:./style-index.css",
+  "viewScript": "file:./frontend.js"
+}

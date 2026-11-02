@@ -1,0 +1,831 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "popup-builder-block/form",
+  "version": "1.0.0",
+  "title": "Form",
+  "category": "popup-builder-block",
+  "icon": "menu-alt3",
+  "keywords": [
+    "form",
+    "data",
+    "popupkit",
+    "popup-builder-block",
+    "submit"
+  ],
+  "description": "popup-builder-block Form block.",
+  "example": {
+    "preview": true
+  },
+  "attributes": {
+    "blockID": {
+      "type": "string"
+    },
+    "blockClass": {
+      "type": "string"
+    },
+    "blocksCSS": {
+      "type": "object"
+    },
+    "inputFieldSize": {
+      "type": "string",
+      "default": "25"
+    },
+    "showLabel": {
+      "type": "boolean",
+      "default": false
+    },
+    "requiredMark": {
+      "type": "boolean",
+      "default": false
+    },
+    "hideNameField": {
+      "type": "boolean",
+      "default": false
+    },
+    "formBgColor": {
+      "type": "string"
+    },
+    "formPaddingDesktop": {
+      "type": "object"
+    },
+    "formPaddingTablet": {
+      "type": "object"
+    },
+    "formPaddingMobile": {
+      "type": "object"
+    },
+    "formPaddingTabletLandscape": {
+      "type": "object"
+    },
+    "formPaddingMobileLandscape": {
+      "type": "object"
+    },
+    "formPaddingLaptop": {
+      "type": "object"
+    },
+    "formPaddingWideScreen": {
+      "type": "object"
+    },
+    "formMarginDesktop": {
+      "type": "object"
+    },
+    "formMarginTablet": {
+      "type": "object"
+    },
+    "formMarginMobile": {
+      "type": "object"
+    },
+    "formMarginTabletLandscape": {
+      "type": "object"
+    },
+    "formMarginMobileLandscape": {
+      "type": "object"
+    },
+    "formMarginLaptop": {
+      "type": "object"
+    },
+    "formMarginWideScreen": {
+      "type": "object"
+    },
+    "buttonWidthDesktop": {
+      "type": "object",
+      "default": {
+        "unit": "%",
+        "size": 100
+      }
+    },
+    "buttonWidthTablet": {
+      "type": "object"
+    },
+    "buttonWidthMobile": {
+      "type": "object"
+    },
+    "buttonText": {
+      "type": "string",
+      "default": "Subscribe Now"
+    },
+    "buttonClickAction": {
+      "type": "string",
+      "default": "none"
+    },
+    "buttonRedirectUrl": {
+      "type": "object"
+    },
+    "buttonEmail": {
+      "type": "string"
+    },
+    "buttonSuccessMessage": {
+      "type": "string",
+      "default": "Submitted Successfully"
+    },
+    "buttonPhone": {
+      "type": "string"
+    },
+    "buttonCopyText": {
+      "type": "string"
+    },
+    "buttonNewWindowUrl": {
+      "type": "object"
+    },
+    "closeCampaign": {
+      "type": "boolean",
+      "default": true
+    },
+    "closeCampaignDelay": {
+      "type": "number",
+      "default": 3
+    },
+    "istrackConversion": {
+      "type": "boolean",
+      "default": true
+    },
+    "integration": {
+      "type": "array",
+      "default": []
+    },
+    "popupkitLeads": {
+      "type": "array",
+      "default": [
+        {
+          "label": "Location",
+          "value": "location"
+        },
+        {
+          "label": "Browser",
+          "value": "browser"
+        },
+        {
+          "label": "Device",
+          "value": "device"
+        }
+      ]
+    },
+    "mailchimpAccount": {
+      "type": "object"
+    },
+    "fluentCRMAccount": {
+      "type": "object"
+    },
+    "activeCampaignAccount": {
+      "type": "object"
+    },
+    "hubspotAccount": {
+      "type": "object"
+    },
+    "zapierAccount": {
+      "type": "object"
+    },
+    "mailchimpDoubleOptin": {
+      "type": "boolean",
+      "default": false
+    },
+    "mailchimpList": {
+      "type": "object"
+    },
+    "activeCampaignList": {
+      "type": "object"
+    },
+    "hubspotList": {
+      "type": "object"
+    },
+    "zapierList": {
+      "type": "object"
+    },
+    "columnsGapDesktop": {
+      "type": "object",
+      "default": {
+        "unit": "px",
+        "size": 10
+      }
+    },
+    "columnsGapWideScreen": {
+      "type": "object"
+    },
+    "columnsGapLaptop": {
+      "type": "object"
+    },
+    "columnsGapTabletLandscape": {
+      "type": "object"
+    },
+    "columnsGapTablet": {
+      "type": "object"
+    },
+    "columnsGapMobileLandscape": {
+      "type": "object"
+    },
+    "columnsGapMobile": {
+      "type": "object"
+    },
+    "rowsGapDesktop": {
+      "type": "object",
+      "default": {
+        "unit": "px",
+        "size": 10
+      }
+    },
+    "rowsGapWideScreen": {
+      "type": "object"
+    },
+    "rowsGapLaptop": {
+      "type": "object"
+    },
+    "rowsGapTabletLandscape": {
+      "type": "object"
+    },
+    "rowsGapTablet": {
+      "type": "object"
+    },
+    "rowsGapMobileLandscape": {
+      "type": "object"
+    },
+    "rowsGapMobile": {
+      "type": "object"
+    },
+    "fieldPlaceholderColor": {
+      "type": "string"
+    },
+    "fieldPlaceholderColorHover": {
+      "type": "string"
+    },
+    "fieldPlaceholderColorFocus": {
+      "type": "string"
+    },
+    "fieldColor": {
+      "type": "string"
+    },
+    "fieldColorHover": {
+      "type": "string"
+    },
+    "fieldColorFocus": {
+      "type": "string"
+    },
+    "fieldBgColor": {
+      "type": "string"
+    },
+    "fieldBgColorHover": {
+      "type": "string"
+    },
+    "fieldBgColorFocus": {
+      "type": "string"
+    },
+    "fieldTypography": {
+      "type": "object"
+    },
+    "fieldPaddingDesktop": {
+      "type": "object"
+    },
+    "fieldPaddingWideScreen": {
+      "type": "object"
+    },
+    "fieldPaddingLaptop": {
+      "type": "object"
+    },
+    "fieldPaddingTablet": {
+      "type": "object"
+    },
+    "fieldPaddingTabletLandscape": {
+      "type": "object"
+    },
+    "fieldPaddingMobile": {
+      "type": "object"
+    },
+    "fieldPaddingMobileLandscape": {
+      "type": "object"
+    },
+    "fieldBorder": {
+      "type": "object"
+    },
+    "fieldBorderHover": {
+      "type": "object"
+    },
+    "fieldBorderFocus": {
+      "type": "object"
+    },
+    "fieldBoxShadow": {
+      "type": "object"
+    },
+    "fieldBoxShadowHover": {
+      "type": "object"
+    },
+    "fieldBoxShadowFocus": {
+      "type": "object"
+    },
+    "fieldBorderRadiusDesktop": {
+      "type": "object"
+    },
+    "fieldBorderRadiusTablet": {
+      "type": "object"
+    },
+    "fieldBorderRadiusMobile": {
+      "type": "object"
+    },
+    "fieldBorderRadiusTabletLandscape": {
+      "type": "object"
+    },
+    "fieldBorderRadiusMobileLandscape": {
+      "type": "object"
+    },
+    "fieldBorderRadiusLaptop": {
+      "type": "object"
+    },
+    "fieldBorderRadiusWideScreen": {
+      "type": "object"
+    },
+    "fieldBorderRadiusHoverDesktop": {
+      "type": "object"
+    },
+    "fieldBorderRadiusHoverTablet": {
+      "type": "object"
+    },
+    "fieldBorderRadiusHoverMobile": {
+      "type": "object"
+    },
+    "fieldBorderRadiusHoverTabletLandscape": {
+      "type": "object"
+    },
+    "fieldBorderRadiusHoverMobileLandscape": {
+      "type": "object"
+    },
+    "fieldBorderRadiusHoverLaptop": {
+      "type": "object"
+    },
+    "fieldBorderRadiusHoverWideScreen": {
+      "type": "object"
+    },
+    "fieldBorderRadiusFocusDesktop": {
+      "type": "object"
+    },
+    "fieldBorderRadiusFocusTablet": {
+      "type": "object"
+    },
+    "fieldBorderRadiusFocusMobile": {
+      "type": "object"
+    },
+    "fieldBorderRadiusFocusTabletLandscape": {
+      "type": "object"
+    },
+    "fieldBorderRadiusFocusMobileLandscape": {
+      "type": "object"
+    },
+    "fieldBorderRadiusFocusLaptop": {
+      "type": "object"
+    },
+    "fieldBorderRadiusFocusWideScreen": {
+      "type": "object"
+    },
+    "labelSpacingDesktop": {
+      "type": "object",
+      "default": {
+        "unit": "px",
+        "size": 10
+      }
+    },
+    "labelSpacingWideScreen": {
+      "type": "object"
+    },
+    "labelSpacingLaptop": {
+      "type": "object"
+    },
+    "labelSpacingTabletLandscape": {
+      "type": "object"
+    },
+    "labelSpacingTablet": {
+      "type": "object"
+    },
+    "labelSpacingMobileLandscape": {
+      "type": "object"
+    },
+    "labelSpacingMobile": {
+      "type": "object"
+    },
+    "labelColor": {
+      "type": "string"
+    },
+    "markColor": {
+      "type": "string"
+    },
+    "labelTypography": {
+      "type": "object"
+    },
+    "buttonAlignmentDesktop": {
+      "type": "string"
+    },
+    "buttonAlignmentWideScreen": {
+      "type": "string"
+    },
+    "buttonAlignmentLaptop": {
+      "type": "string"
+    },
+    "buttonAlignmentTablet": {
+      "type": "string"
+    },
+    "buttonAlignmentTabletLandscape": {
+      "type": "string"
+    },
+    "buttonAlignmentMobileLandscape": {
+      "type": "string"
+    },
+    "buttonAlignmentMobile": {
+      "type": "string"
+    },
+    "buttonTypography": {
+      "type": "object"
+    },
+    "textShadow": {
+      "type": "object"
+    },
+    "usebuttonIcon": {
+      "type": "boolean",
+      "default": false
+    },
+    "buttonIcon": {
+      "type": "object"
+    },
+    "buttonBoxShadowNormal": {
+      "type": "object"
+    },
+    "buttonBoxShadowHover": {
+      "type": "object"
+    },
+    "iconPosition": {
+      "type": "string",
+      "default": "left"
+    },
+    "iconSpaceBetween": {
+      "type": "object",
+      "default": {
+        "unit": "px",
+        "size": 10
+      }
+    },
+    "buttonIconSizeDesktop": {
+      "type": "object"
+    },
+    "buttonIconSizeWideScreen": {
+      "type": "object"
+    },
+    "buttonIconSizeLaptop": {
+      "type": "object"
+    },
+    "buttonIconSizeTabletLandscape": {
+      "type": "object"
+    },
+    "buttonIconSizeTablet": {
+      "type": "object"
+    },
+    "buttonIconSizeMobileLandscape": {
+      "type": "object"
+    },
+    "buttonIconSizeMobile": {
+      "type": "object"
+    },
+    "buttonColor": {
+      "type": "string"
+    },
+    "buttonIconColor": {
+      "type": "string"
+    },
+    "buttonHoverIconColor": {
+      "type": "string"
+    },
+    "buttonBgColor": {
+      "type": "string"
+    },
+    "buttonBorder": {
+      "type": "object"
+    },
+    "buttonHoverColor": {
+      "type": "string"
+    },
+    "buttonHoverBgColor": {
+      "type": "string"
+    },
+    "buttonHoverBorder": {
+      "type": "object"
+    },
+    "buttonBorderRadiusDesktop": {
+      "type": "object"
+    },
+    "buttonBorderRadiusWideScreen": {
+      "type": "object"
+    },
+    "buttonBorderRadiusLaptop": {
+      "type": "object"
+    },
+    "buttonBorderRadiusTabletLandscape": {
+      "type": "object"
+    },
+    "buttonBorderRadiusTablet": {
+      "type": "object"
+    },
+    "buttonBorderRadiusMobileLandscape": {
+      "type": "object"
+    },
+    "buttonBorderRadiusMobile": {
+      "type": "object"
+    },
+    "buttonPaddingDesktop": {
+      "type": "object"
+    },
+    "buttonPaddingWideScreen": {
+      "type": "object"
+    },
+    "buttonPaddingLaptop": {
+      "type": "object"
+    },
+    "buttonPaddingTabletLandscape": {
+      "type": "object"
+    },
+    "buttonPaddingTablet": {
+      "type": "object"
+    },
+    "buttonPaddingMobileLandscape": {
+      "type": "object"
+    },
+    "buttonPaddingMobile": {
+      "type": "object"
+    },
+    "buttonMarginDesktop": {
+      "type": "object"
+    },
+    "buttonMarginWideScreen": {
+      "type": "object"
+    },
+    "buttonMarginLaptop": {
+      "type": "object"
+    },
+    "buttonMarginTabletLandscape": {
+      "type": "object"
+    },
+    "buttonMarginTablet": {
+      "type": "object"
+    },
+    "buttonMarginMobileLandscape": {
+      "type": "object"
+    },
+    "buttonMarginMobile": {
+      "type": "object"
+    },
+    "successMessageColor": {
+      "type": "string"
+    },
+    "successMessageBg": {
+      "type": "string"
+    },
+    "errorMessageColor": {
+      "type": "string"
+    },
+    "errorMessageBg": {
+      "type": "string"
+    },
+    "submissionMessageWidthDesktop": {
+      "type": "object",
+      "default": {
+        "unit": "px",
+        "size": 400
+      }
+    },
+    "submissionMessageWidthWideScreen": {
+      "type": "object"
+    },
+    "submissionMessageWidthLaptop": {
+      "type": "object"
+    },
+    "submissionMessageWidthTabletLandscape": {
+      "type": "object"
+    },
+    "submissionMessageWidthTablet": {
+      "type": "object"
+    },
+    "submissionMessageWidthMobileLandscape": {
+      "type": "object"
+    },
+    "submissionMessageWidthMobile": {
+      "type": "object"
+    },
+    "submissionMessagePaddingDesktop": {
+      "type": "object"
+    },
+    "submissionMessagePaddingWideScreen": {
+      "type": "object"
+    },
+    "submissionMessagePaddingLaptop": {
+      "type": "object"
+    },
+    "submissionMessagePaddingTabletLandscape": {
+      "type": "object"
+    },
+    "submissionMessagePaddingTablet": {
+      "type": "object"
+    },
+    "submissionMessagePaddingMobileLandscape": {
+      "type": "object"
+    },
+    "submissionMessagePaddingMobile": {
+      "type": "object"
+    },
+    "submissionMessageMarginDesktop": {
+      "type": "object"
+    },
+    "submissionMessageMarginWideScreen": {
+      "type": "object"
+    },
+    "submissionMessageMarginLaptop": {
+      "type": "object"
+    },
+    "submissionMessageMarginTabletLandscape": {
+      "type": "object"
+    },
+    "submissionMessageMarginTablet": {
+      "type": "object"
+    },
+    "submissionMessageMarginMobileLandscape": {
+      "type": "object"
+    },
+    "submissionMessageMarginMobile": {
+      "type": "object"
+    },
+    "submissionSuccessMessageBorder": {
+      "type": "object"
+    },
+    "submissionErrorMessageBorder": {
+      "type": "object"
+    },
+    "submissionMessageBorderRadiusDesktop": {
+      "type": "object"
+    },
+    "submissionMessageBorderRadiusWideScreen": {
+      "type": "object"
+    },
+    "submissionMessageBorderRadiusLaptop": {
+      "type": "object"
+    },
+    "submissionMessageBorderRadiusTabletLandscape": {
+      "type": "object"
+    },
+    "submissionMessageBorderRadiusTablet": {
+      "type": "object"
+    },
+    "submissionMessageBorderRadiusMobileLandscape": {
+      "type": "object"
+    },
+    "submissionMessageBorderRadiusMobile": {
+      "type": "object"
+    },
+    "fieldIconColor": {
+      "type": "string"
+    },
+    "fieldIconSizeDesktop": {
+      "type": "object"
+    },
+    "fieldIconSizeWideScreen": {
+      "type": "object"
+    },
+    "fieldIconSizeLaptop": {
+      "type": "object"
+    },
+    "fieldIconSizeTabletLandscape": {
+      "type": "object"
+    },
+    "fieldIconSizeTablet": {
+      "type": "object"
+    },
+    "fieldIconSizeMobileLandscape": {
+      "type": "object"
+    },
+    "fieldIconSizeMobile": {
+      "type": "object"
+    },
+    "fieldIconPaddingDesktop": {
+      "type": "object"
+    },
+    "fieldIconPaddingWideScreen": {
+      "type": "object"
+    },
+    "fieldIconPaddinglaptop": {
+      "type": "object"
+    },
+    "fieldIconPaddingTabletLandscape": {
+      "type": "object"
+    },
+    "fieldIconPaddingTablet": {
+      "type": "object"
+    },
+    "fieldIconPaddingMobileLandscape": {
+      "type": "object"
+    },
+    "fieldIconPaddingMobile": {
+      "type": "object"
+    },
+    "formFields": {
+      "type": "array",
+      "default": [
+        {
+          "type": "name",
+          "label": "Name",
+          "placeholder": "Enter your name",
+          "required": true,
+          "width": {
+            "fieldSize": {
+              "Desktop": {
+                "unit": "%",
+                "size": 100
+              }
+            }
+          },
+          "showIcon": false
+        },
+        {
+          "type": "email",
+          "label": "Email",
+          "placeholder": "Enter your email",
+          "required": true,
+          "width": {
+            "fieldSize": {
+              "Desktop": {
+                "unit": "%",
+                "size": 100
+              }
+            }
+          },
+          "showIcon": false
+        }
+      ]
+    },
+    "isButtonPosition": {
+      "type": "boolean",
+      "default": false
+    },
+    "buttonPosition": {
+      "type": "string",
+      "default": ""
+    },
+    "buttonVerticalOrientation": {
+      "type": "string"
+    },
+    "buttonVerticalOffsetDesktop": {
+      "type": "object"
+    },
+    "buttonVerticalOffsetWideScreen": {
+      "type": "object"
+    },
+    "buttonVerticalOffsetLaptop": {
+      "type": "object"
+    },
+    "buttonVerticalOffsetTablet": {
+      "type": "object"
+    },
+    "buttonVerticalOffsetTabletLandscape": {
+      "type": "object"
+    },
+    "buttonVerticalOffsetMobile": {
+      "type": "object"
+    },
+    "buttonVerticalOffsetMobileLandscape": {
+      "type": "object"
+    },
+    "buttonHorizontalOrientation": {
+      "type": "string"
+    },
+    "buttonHorizontalOffsetDesktop": {
+      "type": "object"
+    },
+    "buttonHorizontalOffsetWideScreen": {
+      "type": "object"
+    },
+    "buttonHorizontalOffsetLaptop": {
+      "type": "object"
+    },
+    "buttonHorizontalOffsetTablet": {
+      "type": "object"
+    },
+    "buttonHorizontalOffsetTabletLandscape": {
+      "type": "object"
+    },
+    "buttonHorizontalOffsetMobile": {
+      "type": "object"
+    },
+    "buttonHorizontalOffsetMobileLandscape": {
+      "type": "object"
+    },
+    "successMessageTypography": {
+      "type": "object"
+    },
+    "successMessageBorder": {
+      "type": "object"
+    },
+    "successMessageBoxShadow": {
+      "type": "object"
+    }
+  },
+  "supports": {
+    "html": false,
+    "anchor": true
+  },
+  "textdomain": "popup-builder-block",
+  "editorScript": "file:./index.js",
+  "editorStyle": "file:./index.css",
+  "style": "file:./style-index.css",
+  "viewScript": "file:./frontend.js"
+}

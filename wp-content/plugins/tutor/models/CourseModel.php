@@ -1,0 +1,1827 @@
+<?php
+/**
+ * Course Model
+ *
+ * @package Tutor\Models
+ * @author Themeum <support@themeum.com>
+ * @link https://themeum.com
+ * @since 2.0.6
+ */
+
+namespace Tutor\Models;
+
+use Tutor\Helpers\DateTimeHelper;
+use TUTOR\Icon;
+use TUTOR\Course;
+use TUTOR\Lesson;
+use Tutor\Ecommerce\Tax;
+use InvalidArgumentException;
+use Tutor\Helpers\QueryHelper;
+use TUTOR\User;
+use TUTOR_ASSIGNMENTS\Assignments;
+
+/**
+ * CourseModel Class
+ *
+ * @since 2.0.6
+ */
+class CourseModel {
+	/**
+	 * WordPress course type name
+	 *
+	 * @var string
+	 */
+	const POST_TYPE       = 'courses';
+	const COURSE_CATEGORY = 'course-category';
+	const COURSE_TAG      = 'course-tag';
+
+	const STATUS_PUBLISH    = 'publish';
+	const STATUS_DRAFT      = 'draft';
+	const STATUS_AUTO_DRAFT = 'auto-draft';
+	const STATUS_PENDING    = 'pending';
+	const STATUS_PRIVATE    = 'private';
+	const STATUS_FUTURE     = 'future';
+	const STATUS_TRASH      = 'trash';
+
+	/**
+	 * Course completion modes
+	 */
+	const MODE_FLEXIBLE = 'flexible';
+	const MODE_STRICT   = 'strict';
+
+	/**
+	 * Course attachment/downloadable resources meta key
+	 *
+	 * @var string
+	 */
+	const ATTACHMENT_META_KEY = '_tutor_attachments';
+
+	/**
+	 * Course benefits meta key
+	 *
+	 * @var string
+	 */
+	const BENEFITS_META_KEY = '_tutor_course_benefits';
+
+	/**
+	 * The constant representing the status when a course is completed.
+	 *
+	 * @since 3.8.1
+	 *
+	 * @var string
+	 */
+	const COURSE_COMPLETED = 'course_completed';
+
+	/**
+	 * Get available status list.
+	 *
+	 * @since 3.0.0
+	 *
+	 * @return array
+	 */
+	public static function get_status_list() {
+		return array(
+			self::STATUS_DRAFT,
+			self::STATUS_AUTO_DRAFT,
+			self::STATUS_PUBLISH,
+			self::STATUS_PRIVATE,
+			self::STATUS_FUTURE,
+			self::STATUS_PENDING,
+			self::STATUS_TRASH,
+		);
+	}
+
+	/**
+	 * Check if a course is available for enrollment or purchase.
+	 *
+	 * @since 4.0.0
+	 *
+	 * @param integer $course_id the course id.
+	 *
+	 * @return bool
+	 */
+	public static function is_course_accessible( $course_id = 0 ) {
+		$course = get_post( $course_id );
+		if ( ! $course || ! is_object( $course ) ) {
+			return false;
+		}
+
+		if ( ! in_array( $course->post_type, array( tutor()->course_post_type, tutor()->bundle_post_type ), true ) ) {
+			return false;
+		}
+
+		if ( ! in_array( $course->post_status, array( self::STATUS_PUBLISH, self::STATUS_PRIVATE ), true ) ) {
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * Course record count
+	 *
+	 * @since 2.0.7
+	 *
+	 * @since 3.6.0 $post_type param added
+	 *
+	 * @param string $status Post status.
+	 * @param string $post_type Post type.
+	 *
+	 * @return int
+	 */
+	public static function count( $status = self::STATUS_PUBLISH, $post_type = self::POST_TYPE ) {
+		$count_obj = wp_count_posts( $post_type );
+		if ( 'all' === $status ) {
+			return array_sum( (array) $count_obj );
+		}
+
+		return (int) $count_obj->{$status};
+	}
+
+	/**
+	 * Get tutor post types
+	 *
+	 * @since 3.5.0
+	 *
+	 * @param int|\WP_POST $post the post id or object.
+	 *
+	 * @return bool
+	 */
+	public static function get_post_types( $post ) {
+		return apply_filters( 'tutor_check_course_post_type', self::POST_TYPE === get_post_type( $post ), get_post_type( $post ) );
+	}
+
+	/**
+	 * Get courses
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param array $excludes   exclude course ids.
+	 * @param array $post_status post status array.
+	 *
+	 * @return array|null|object
+	 */
+	public static function get_courses( $excludes = array(), $post_status = array( 'publish' ) ) {
+		global $wpdb;
+
+		$excludes      = (array) $excludes;
+		$exclude_query = '';
+
+		if ( count( $excludes ) ) {
+			$exclude_query = implode( "','", $excludes );
+		}
+
+		$post_status = array_map(
+			function ( $element ) {
+				return "'" . $element . "'";
+			},
+			$post_status
+		);
+
+		$post_status      = implode( ',', $post_status );
+		$course_post_type = tutor()->course_post_type;
+
+		//phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		$query = $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT ID,
+					post_author,
+					post_title,
+					post_name,
+					post_status,
+					menu_order
+			FROM 	{$wpdb->posts}
+			WHERE 	post_status IN ({$post_status})
+					AND ID NOT IN('$exclude_query')
+					AND post_type = %s;
+			",
+				$course_post_type
+			)
+		);
+		//phpcs:enable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+
+		return $query;
+	}
+
+	/**
+	 * Get courses using provided args
+	 *
+	 * If user is not admin then it will return only current user's post
+	 *
+	 * @since 3.0.0
+	 *
+	 * @param array $args Args.
+	 *
+	 * @return \WP_Query
+	 */
+	public static function get_courses_by_args( array $args = array() ) {
+
+		$default_args = array(
+			'post_type'      => tutor()->course_post_type,
+			'posts_per_page' => -1,
+			'post_status'    => 'publish',
+		);
+
+		if ( ! current_user_can( 'manage_options' ) ) {
+			$default_args['author'] = get_current_user_id();
+		}
+
+		$args = wp_parse_args( $args, apply_filters( 'tutor_get_course_list_filter_args', $default_args ) );
+
+		return new \WP_Query( $args );
+	}
+
+	/**
+	 * Get course count by instructor
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param int $instructor_id instructor ID.
+	 *
+	 * @return null|string
+	 */
+	public static function get_course_count_by_instructor( $instructor_id ) {
+		global $wpdb;
+
+		$course_post_type = tutor()->course_post_type;
+
+		$count = $wpdb->get_var(
+			$wpdb->prepare(
+				"SELECT COUNT(ID)
+			FROM 	{$wpdb->posts}
+					INNER JOIN {$wpdb->usermeta}
+							ON user_id = %d
+							AND meta_key = %s
+							AND meta_value = ID
+			WHERE 	post_status = %s
+					AND post_type = %s;
+			",
+				$instructor_id,
+				'_tutor_instructor_course_id',
+				'publish',
+				$course_post_type
+			)
+		);
+
+		return $count;
+	}
+
+	/**
+	 * Get course by quiz
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param int $quiz_id quiz id.
+	 *
+	 * @return mixed WP_Post|null
+	 */
+	public static function get_course_by_quiz( $quiz_id ) {
+		return get_post_parent( get_post_parent( $quiz_id ) );
+	}
+
+	/**
+	 * Get courses by a instructor
+	 *
+	 * @since 1.0.0
+	 * @since 3.5.0 param $post_types added.
+	 * @since 4.0.0 params $search and $order added.
+	 *
+	 * @param integer      $instructor_id instructor id.
+	 * @param array|string $post_status post status.
+	 * @param integer      $offset offset.
+	 * @param integer      $limit limit.
+	 * @param boolean      $count_only count or not.
+	 * @param array        $post_types array of post types.
+	 * @param string       $search search keyword.
+	 * @param string       $order order.
+	 *
+	 * @return array|null|object
+	 */
+	public static function get_courses_by_instructor(
+		$instructor_id = 0,
+		$post_status = array( 'publish' ),
+		int $offset = 0,
+		int $limit = PHP_INT_MAX,
+		$count_only = false,
+		$post_types = array(),
+		$search = '',
+		$order = 'DESC'
+	) {
+		global $wpdb;
+		$offset        = sanitize_text_field( $offset );
+		$limit         = sanitize_text_field( $limit );
+		$instructor_id = tutils()->get_user_id( $instructor_id );
+
+		if ( ! count( $post_types ) ) {
+			$post_types = array( tutor()->course_post_type );
+		}
+
+		$post_types = QueryHelper::prepare_in_clause( $post_types );
+
+		if ( empty( $post_status ) || 'any' == $post_status ) {
+			$where_post_status = '';
+		} else {
+			! is_array( $post_status ) ? $post_status = array( $post_status ) : 0;
+			$statuses                                 = "'" . implode( "','", $post_status ) . "'";
+			$where_post_status                        = "AND $wpdb->posts.post_status IN({$statuses}) ";
+		}
+
+		$search_sql = '';
+		if ( ! empty( $search ) ) {
+			$like       = '%' . $wpdb->esc_like( $search ) . '%';
+			$search_sql = $wpdb->prepare(
+				" AND ( {$wpdb->posts}.post_title LIKE %s OR {$wpdb->posts}.post_excerpt LIKE %s ) ",
+				$like,
+				$like
+			);
+		}
+
+		$order     = strtoupper( $order ) === 'ASC' ? 'ASC' : 'DESC';
+		$order_sql = " ORDER BY $wpdb->posts.post_date {$order} ";
+
+		$select_col   = $count_only ? " COUNT(DISTINCT $wpdb->posts.ID) " : " $wpdb->posts.* ";
+		$limit_offset = $count_only ? '' : " LIMIT $offset, $limit ";
+
+		//phpcs:disable
+		$query = $wpdb->prepare(
+			"SELECT $select_col
+			FROM $wpdb->posts
+			LEFT JOIN {$wpdb->usermeta}
+				ON $wpdb->usermeta.user_id = %d
+				AND $wpdb->usermeta.meta_key = %s
+				AND $wpdb->usermeta.meta_value = $wpdb->posts.ID
+			WHERE 1 = 1 {$where_post_status}
+				AND $wpdb->posts.post_type IN ({$post_types})
+				AND ($wpdb->posts.post_author = %d OR $wpdb->usermeta.user_id = %d)
+				{$search_sql}
+			{$order_sql} {$limit_offset}",
+			$instructor_id,
+			'_tutor_instructor_course_id',
+			$instructor_id,
+			$instructor_id
+		);
+		//phpcs:enable
+
+		$query = apply_filters( 'modify_get_courses_by_instructor_query', $query, $instructor_id, $where_post_status, $post_types, $limit_offset, $select_col );
+
+		//phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+		return $count_only ? $wpdb->get_var( $query ) : $wpdb->get_results( $query, OBJECT );
+	}
+
+	/**
+	 * Get courses for instructors
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param int $instructor_id    Instructor ID.
+	 * @return array|null|object
+	 */
+	public function get_courses_for_instructors( $instructor_id = 0 ) {
+		$instructor_id    = tutor_utils()->get_user_id( $instructor_id );
+		$course_post_type = tutor()->course_post_type;
+
+		$courses = get_posts(
+			array(
+				'post_type'      => $course_post_type,
+				'author'         => $instructor_id,
+				'post_status'    => array( 'publish', 'pending' ),
+				'posts_per_page' => 5,
+			)
+		);
+
+		return $courses;
+	}
+
+	/**
+	 * Check a user is main instructor of a course
+	 *
+	 * @since 2.1.6
+	 *
+	 * @param integer $course_id course id.
+	 * @param integer $user_id instructor id ( optional ) default: current user id.
+	 *
+	 * @return boolean
+	 */
+	public static function is_main_instructor( $course_id, $user_id = 0 ) {
+		$course  = get_post( $course_id );
+		$user_id = tutor_utils()->get_user_id( $user_id );
+
+		if ( ! $course || ! self::get_post_types( $course_id ) || $user_id !== (int) $course->post_author ) {
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * Mark the course as completed
+	 *
+	 * @since 2.0.7
+	 *
+	 * @param int $course_id    course id which is completed.
+	 * @param int $user_id      student id who completed the course.
+	 *
+	 * @return bool
+	 */
+	public static function mark_course_as_completed( $course_id, $user_id ) {
+		if ( ! $course_id || ! $user_id ) {
+			return false;
+		}
+
+		do_action( 'tutor_course_complete_before', $course_id );
+
+		/**
+		 * Marking course completed at Comment.
+		 */
+		global $wpdb;
+
+		$date = date( 'Y-m-d H:i:s', tutor_time() ); //phpcs:ignore
+
+		// Making sure that, hash is unique.
+		do {
+			$hash     = substr( md5( wp_generate_password( 32 ) . $date . $course_id . $user_id ), 0, 16 );
+			$has_hash = (int) $wpdb->get_var(
+				$wpdb->prepare(
+					"SELECT COUNT(comment_ID) from {$wpdb->comments}
+				    WHERE comment_agent = 'TutorLMSPlugin' AND comment_type = 'course_completed' AND comment_content = %s ",
+					$hash
+				)
+			);
+
+		} while ( $has_hash > 0 );
+
+		$data = array(
+			'comment_post_ID'  => $course_id,
+			'comment_author'   => $user_id,
+			'comment_date'     => $date,
+			'comment_date_gmt' => get_gmt_from_date( $date ),
+			'comment_content'  => $hash, // Identification Hash.
+			'comment_approved' => 'approved',
+			'comment_agent'    => 'TutorLMSPlugin',
+			'comment_type'     => 'course_completed',
+			'user_id'          => $user_id,
+		);
+
+		$wpdb->insert( $wpdb->comments, $data );
+
+		do_action( 'tutor_course_complete_after', $course_id, $user_id );
+
+		return true;
+	}
+
+	/**
+	 * Delete a course by ID
+	 *
+	 * @since 2.0.9
+	 *
+	 * @param int $post_id  course id that need to delete.
+	 * @return bool
+	 */
+	public static function delete_course( $post_id ) {
+		if ( ! self::get_post_types( $post_id ) ) {
+			return false;
+		}
+
+		wp_delete_post( $post_id, true );
+		return true;
+	}
+
+	/**
+	 * Get post ids by post type and parent_id
+	 *
+	 * @since 1.6.6
+	 *
+	 * @param string  $post_type post type.
+	 * @param integer $post_parent post parent ID.
+	 *
+	 * @return array
+	 */
+	private function get_post_ids( $post_type, $post_parent ) {
+		$args = array(
+			'fields'         => 'ids',
+			'post_type'      => $post_type,
+			'post_parent'    => $post_parent,
+			'post_status'    => 'any',
+			'posts_per_page' => -1,
+		);
+		return get_posts( $args );
+	}
+
+	/**
+	 * Delete course data when permanently deleting a course.
+	 *
+	 * @since 1.6.6
+	 * @since 2.0.9 updated
+	 *
+	 * @param integer $post_id post ID.
+	 * @return bool
+	 */
+	public function delete_course_data( $post_id ) {
+		$course_post_type = tutor()->course_post_type;
+		if ( get_post_type( $post_id ) !== $course_post_type ) {
+			return false;
+		}
+
+		do_action( 'tutor_before_delete_course_content', $post_id, 0 );
+
+		global $wpdb;
+
+		$lesson_post_type     = tutor()->lesson_post_type;
+		$assignment_post_type = tutor()->assignment_post_type;
+		$quiz_post_type       = tutor()->quiz_post_type;
+
+		$topic_ids = $this->get_post_ids( 'topics', $post_id );
+
+		// Course > Topic > ( Lesson | Quiz | Assignment ).
+		if ( ! empty( $topic_ids ) ) {
+			foreach ( $topic_ids as $topic_id ) {
+				$content_post_type = array( $lesson_post_type, $assignment_post_type, $quiz_post_type );
+				$topic_content_ids = $this->get_post_ids( $content_post_type, $topic_id );
+
+				foreach ( $topic_content_ids as $content_id ) {
+					/**
+					 * Delete Quiz data
+					 */
+					if ( get_post_type( $content_id ) === $quiz_post_type ) {
+						// Collect file paths from all question types that store files before deleting rows (files deleted after DB for safety).
+						$attempts_for_quiz  = QueryHelper::get_all( 'tutor_quiz_attempts', array( 'quiz_id' => $content_id ), 'attempt_id', -1 );
+						$attempt_file_paths = array();
+						if ( ! empty( $attempts_for_quiz ) ) {
+							$attempt_ids        = array_map(
+								function ( $row ) {
+									return (int) $row->attempt_id;
+								},
+								$attempts_for_quiz
+							);
+							$attempt_file_paths = apply_filters( 'tutor_quiz/attempt_file_paths_for_deletion', array(), $attempt_ids );
+							$attempt_file_paths = is_array( $attempt_file_paths ) ? array_values( array_filter( array_unique( $attempt_file_paths ) ) ) : array();
+						}
+
+						$wpdb->delete( $wpdb->prefix . 'tutor_quiz_attempts', array( 'quiz_id' => $content_id ) );
+						$wpdb->delete( $wpdb->prefix . 'tutor_quiz_attempt_answers', array( 'quiz_id' => $content_id ) );
+
+						QuizModel::delete_files_by_paths( $attempt_file_paths );
+
+						do_action( 'tutor_before_delete_quiz_content', $content_id, null );
+
+						// Collect instructor file paths before deleting question data (e.g. draw_image / pin_image masks).
+						/**
+						 * Filter to get file paths for quiz deletion.
+						 * Pro and other add-ons register their question types via this filter.
+						 *
+						 * @param string[] $file_paths Paths collected so far.
+						 * @param int      $quiz_id   Quiz post ID.
+						 */
+						$quiz_file_paths = apply_filters( 'tutor_quiz_quiz_file_paths_for_deletion', array(), $content_id );
+
+						$questions_ids = $wpdb->get_col( $wpdb->prepare( "SELECT question_id FROM {$wpdb->prefix}tutor_quiz_questions WHERE quiz_id = %d ", $content_id ) );
+						if ( is_array( $questions_ids ) && count( $questions_ids ) ) {
+							$in_clause = QueryHelper::prepare_in_clause( $questions_ids );
+							//phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+							$wpdb->query( $wpdb->prepare( "DELETE FROM {$wpdb->prefix}tutor_quiz_question_answers WHERE belongs_question_id IN({$in_clause}) " ) );
+						}
+						$wpdb->delete( $wpdb->prefix . 'tutor_quiz_questions', array( 'quiz_id' => $content_id ) );
+
+						QuizModel::delete_files_by_paths( $quiz_file_paths );
+					}
+
+					/**
+					 * Delete assignment data ( Assignments, Assignment Submit, Assignment Evalutation )
+					 *
+					 * @since 2.0.9
+					 */
+					if ( get_post_type( $content_id ) === $assignment_post_type ) {
+						QueryHelper::delete_comment_with_meta(
+							array(
+								'comment_type'    => 'tutor_assignment',
+								'comment_post_ID' => $content_id,
+							)
+						);
+					}
+
+					wp_delete_post( $content_id, true );
+
+				}
+
+				// Delete zoom meeting.
+				$wpdb->delete(
+					$wpdb->posts,
+					array(
+						'post_parent' => $topic_id,
+						'post_type'   => 'tutor_zoom_meeting',
+					)
+				);
+
+				/**
+				 * Delete Google Meet Record Related to Course Topic
+				 *
+				 * @since 2.1.0
+				 */
+				$wpdb->delete(
+					$wpdb->posts,
+					array(
+						'post_parent' => $topic_id,
+						'post_type'   => 'tutor-google-meet',
+					)
+				);
+
+				wp_delete_post( $topic_id, true );
+			}
+		}
+
+		$child_post_ids = $this->get_post_ids( array( 'tutor_announcements', 'tutor_enrolled', 'tutor_zoom_meeting', 'tutor-google-meet' ), $post_id );
+		if ( ! empty( $child_post_ids ) ) {
+			foreach ( $child_post_ids as $child_post_id ) {
+				wp_delete_post( $child_post_id, true );
+			}
+		}
+
+		/**
+		 * Delete earning, gradebook result, course complete data
+		 *
+		 * @since 2.0.9
+		 */
+		$wpdb->delete( $wpdb->prefix . 'tutor_earnings', array( 'course_id' => $post_id ) );
+		$wpdb->delete( $wpdb->prefix . 'tutor_gradebooks_results', array( 'course_id' => $post_id ) );
+		$wpdb->delete(
+			$wpdb->comments,
+			array(
+				'comment_type'    => 'course_completed',
+				'comment_post_ID' => $post_id,
+			)
+		);
+
+		/**
+		 * Delete onsite notification record & _tutor_instructor_course_id user meta
+		 *
+		 * @since 2.1.0
+		 */
+		$wpdb->query( $wpdb->prepare( "DELETE FROM {$wpdb->prefix}tutor_notifications WHERE post_id=%d AND type IN ('Announcements','Q&A','Enrollments')", $post_id ) );
+		$wpdb->delete(
+			$wpdb->usermeta,
+			array(
+				'meta_key'   => '_tutor_instructor_course_id',
+				'meta_value' => $post_id,
+			)
+		);
+
+		/**
+		 * Delete Course rating and review
+		 *
+		 * @since 2.0.9
+		 */
+		QueryHelper::delete_comment_with_meta(
+			array(
+				'comment_type'    => 'tutor_course_rating',
+				'comment_post_ID' => $post_id,
+			)
+		);
+
+		/**
+		 * Delete Q&A and its status ( read, replied etc )
+		 *
+		 * @since 2.0.9
+		 */
+		QueryHelper::delete_comment_with_meta(
+			array(
+				'comment_type'    => 'tutor_q_and_a',
+				'comment_post_ID' => $post_id,
+			)
+		);
+
+		/**
+		 * Delete caches
+		 */
+		$attempt_cache = new \Tutor\Cache\QuizAttempts();
+		if ( $attempt_cache->has_cache() ) {
+			$attempt_cache->delete_cache();
+		}
+
+		return true;
+	}
+
+
+	/**
+	 * Get paid courses
+	 *
+	 * To identify course is connected with any product
+	 * like WC Product or EDD product meta key will be used
+	 *
+	 * @since 2.2.0
+	 *
+	 * @since 3.0.0
+	 *
+	 * Meta key removed and default meta query updated
+	 *
+	 * @since 3.0.1
+	 * Course::COURSE_PRICE_META meta key exists clause added
+	 *
+	 * @param array $args wp_query args.
+	 *
+	 * @return \WP_Query
+	 */
+	public static function get_paid_courses( array $args = array() ) {
+		$current_user = wp_get_current_user();
+
+		$default_args = array(
+			'post_type'      => tutor()->course_post_type,
+			'posts_per_page' => -1,
+			'offset'         => 0,
+			'post_status'    => 'publish',
+			'meta_query'     => array(
+				'relation' => 'AND',
+				array(
+					'key'     => Course::COURSE_PRICE_TYPE_META,
+					'value'   => Course::PRICE_TYPE_SUBSCRIPTION,
+					'compare' => '!=',
+				),
+				array(
+					'key'     => Course::COURSE_PRICE_META,
+					'compare' => 'EXISTS',
+				),
+			),
+		);
+
+		// Check if the current user is an admin.
+		if ( ! current_user_can( 'administrator' ) ) {
+			$args['author'] = $current_user->ID;
+		}
+
+		$args = wp_parse_args( $args, $default_args );
+		return new \WP_Query( $args );
+	}
+
+	/**
+	 * Check the course is completeable or not
+	 *
+	 * @since 2.4.0
+	 *
+	 * @param int $course_id course id.
+	 * @param int $user_id user id.
+	 *
+	 * @return boolean
+	 */
+	public static function can_complete_course( $course_id, $user_id ) {
+		$mode = tutor_utils()->get_option( 'course_completion_process' );
+		if ( self::MODE_FLEXIBLE === $mode ) {
+			return true;
+		}
+
+		if ( self::MODE_STRICT === $mode ) {
+			$completed_lesson = tutor_utils()->get_completed_lesson_count_by_course( $course_id, $user_id );
+			$lesson_count     = tutor_utils()->get_lesson_count_by_course( $course_id, $user_id );
+
+			if ( $completed_lesson < $lesson_count ) {
+				return false;
+			}
+
+			$quizzes     = array();
+			$assignments = array();
+
+			$course_contents = tutor_utils()->get_course_contents_by_id( $course_id );
+			if ( tutor_utils()->count( $course_contents ) ) {
+				foreach ( $course_contents as $content ) {
+					if ( 'tutor_quiz' === $content->post_type ) {
+						$quizzes[] = $content;
+					}
+					if ( 'tutor_assignments' === $content->post_type ) {
+						$assignments[] = $content;
+					}
+				}
+			}
+
+			foreach ( $quizzes as $row ) {
+				$result = QuizModel::get_quiz_result( $row->ID );
+				if ( 'pass' !== $result ) {
+					return false;
+				}
+			}
+
+			if ( tutor()->has_pro ) {
+				foreach ( $assignments as $row ) {
+					$result = \TUTOR_ASSIGNMENTS\Assignments::get_assignment_result( $row->ID, $user_id );
+					if ( 'pass' !== $result ) {
+						return false;
+					}
+				}
+			}
+
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
+	 * Check a course can be auto complete by an enrolled student.
+	 *
+	 * @since 2.4.0
+	 *
+	 * @param int $course_id course id.
+	 * @param int $user_id user id.
+	 *
+	 * @return boolean
+	 */
+	public static function can_autocomplete_course( $course_id, $user_id ) {
+		$auto_course_complete_option = (bool) tutor_utils()->get_option( 'auto_course_complete_on_all_lesson_completion' );
+		if ( ! $auto_course_complete_option ) {
+			return false;
+		}
+
+		$is_course_completed = tutor_utils()->is_completed_course( $course_id, $user_id );
+		if ( $is_course_completed ) {
+			return false;
+		}
+
+		$course_stats = tutor_utils()->get_course_completed_percent( $course_id, $user_id, true );
+		if ( $course_stats['total_count'] && $course_stats['completed_count'] === $course_stats['total_count'] ) {
+			return self::can_complete_course( $course_id, $user_id );
+		} else {
+			return false;
+		}
+	}
+
+	/**
+	 * Get review progress link when course progress 100% and
+	 * User has pending or fail quiz or assignment
+	 *
+	 * @since 2.4.0
+	 *
+	 * @param int $course_id course id.
+	 * @param int $user_id user id.
+	 *
+	 * @return string course content permalink.
+	 */
+	public static function get_review_progress_link( $course_id, $user_id ) {
+		$course_progress   = tutor_utils()->get_course_completed_percent( $course_id, $user_id, true );
+		$completed_percent = (int) $course_progress['completed_percent'];
+		$course_contents   = tutor_utils()->get_course_contents_by_id( $course_id );
+		$permalink         = '';
+
+		if ( tutor_utils()->count( $course_contents ) && 100 === $completed_percent ) {
+			foreach ( $course_contents as $content ) {
+				if ( 'tutor_quiz' === $content->post_type ) {
+					$result = QuizModel::get_quiz_result( $content->ID, $user_id );
+					if ( 'pass' !== $result ) {
+						$permalink = get_the_permalink( $content->ID );
+						break;
+					}
+				}
+
+				if ( tutor()->has_pro && 'tutor_assignments' === $content->post_type ) {
+					$result = \TUTOR_ASSIGNMENTS\Assignments::get_assignment_result( $content->ID, $user_id );
+					if ( 'pass' !== $result ) {
+						$permalink = get_the_permalink( $content->ID );
+						break;
+					}
+				}
+			}
+		}
+
+		// Fallback link.
+		if ( empty( $permalink ) ) {
+			$permalink = tutils()->get_course_first_lesson( $course_id );
+		}
+
+		return $permalink;
+	}
+
+	/**
+	 * Get course preview image placeholder
+	 *
+	 * @since 3.0.0
+	 *
+	 * @return string
+	 */
+	public static function get_course_preview_image_placeholder() {
+		return tutor()->url . 'assets/images/placeholder.svg';
+	}
+
+	/**
+	 * Retrieve the courses or course bundles that a given coupon code applies to.
+	 *
+	 * This function fetches published courses or course bundles from the database
+	 * based on the specified type. For each course, it retrieves the course prices
+	 * and the course thumbnail URL. If the user has Tutor Pro, it additionally
+	 * retrieves the total number of courses in a course bundle.
+	 *
+	 * @since 3.0.0
+	 *
+	 * @param string $applies_to The type of items the coupon applies to. Accepts 'specific_courses'
+	 *                           for individual courses or any other value for course bundles.
+	 *
+	 * @global wpdb $wpdb WordPress database abstraction object.
+	 *
+	 * @return array An array of course objects. Each course object contains:
+	 *               - int $id: The ID of the course.
+	 *               - string $title: The title of the course.
+	 *               - string $type: The post type of the course (e.g., 'courses', 'course-bundle').
+	 *               - float $price: The regular price of the course.
+	 *               - float $sale_price: The sale price of the course.
+	 *               - string $image: The URL of the course's thumbnail image.
+	 *               - int|null $total_courses: The total number of courses in the bundle
+	 *                                          (only if the user has Tutor Pro and the course type is 'course-bundle').
+	 */
+	public function get_coupon_applies_to_courses( string $applies_to ) {
+		global $wpdb;
+
+		$post_type = 'specific_courses' === $applies_to ? 'courses' : 'course-bundle';
+
+		$where = array(
+			'post_status' => 'publish',
+			'post_type'   => $post_type,
+		);
+
+		$courses = QueryHelper::get_all( $wpdb->posts, $where, 'ID' );
+
+		if ( tutor()->has_pro ) {
+			$bundle_model = new \TutorPro\CourseBundle\Models\BundleModel();
+		}
+
+		$final_data = array();
+
+		if ( ! empty( $courses ) ) {
+			foreach ( $courses as $course ) {
+				$data = new \stdClass();
+
+				if ( tutor()->has_pro && 'course-bundle' === $course->type ) {
+					$data->total_courses = count( $bundle_model->get_bundle_course_ids( $course->ID ) );
+				}
+
+				$author_name      = get_the_author_meta( 'display_name', $course->post_author );
+				$course_prices    = tutor_utils()->get_raw_course_price( $course->ID );
+				$data->id         = (int) $course->ID;
+				$data->title      = $course->post_title;
+				$data->price      = $course_prices->regular_price;
+				$data->sale_price = $course_prices->sale_price;
+				$data->image      = get_the_post_thumbnail_url( $course->ID );
+				$data->author     = $author_name;
+
+				$final_data[] = $data;
+			}
+		}
+
+		return ! empty( $final_data ) ? $final_data : array();
+	}
+
+	/**
+	 * Get course instructor IDs.
+	 *
+	 * @since 3.0.0
+	 *
+	 * @param int $course_id course id.
+	 *
+	 * @return array
+	 */
+	public static function get_course_instructor_ids( $course_id ) {
+		global $wpdb;
+		$instructor_ids = $wpdb->get_col(
+			$wpdb->prepare(
+				"SELECT user_id FROM {$wpdb->usermeta} WHERE meta_key=%s AND meta_value=%s",
+				'_tutor_instructor_course_id',
+				$course_id
+			)
+		);
+
+		return $instructor_ids;
+	}
+
+	/**
+	 * Check tax collection is enabled for single purchase course/bundle
+	 *
+	 * @since 3.7.0
+	 *
+	 * @param int $post_id course or bundle id.
+	 *
+	 * @return boolean
+	 */
+	public static function is_tax_enabled_for_single_purchase( $post_id ) {
+		if ( ! Tax::is_individual_control_enabled() ) {
+			return true;
+		}
+
+		$data = get_post_meta( $post_id, Course::TAX_ON_SINGLE_META, true );
+		return ( '1' === $data || '' === $data );
+	}
+
+	/**
+	 * Count total attachments available in all courses or specific
+	 *
+	 * @since 3.6.0
+	 *
+	 * @param int|array $course_id Course id or array of ids, to get course's attachment.
+	 *
+	 * @return int
+	 */
+	public static function count_attachment( $course_id = 0 ) {
+		global $wpdb;
+
+		$total_count = 0;
+
+		$primary_table  = "$wpdb->posts p";
+		$joining_tables = array(
+			array(
+				'type'  => 'INNER',
+				'table' => "{$wpdb->postmeta} pm",
+				'on'    => "p.ID = pm.post_id AND pm.meta_key = '_tutor_attachments' AND pm.meta_value != 'a:0:{}'",
+			),
+		);
+
+		// Prepare query.
+		$select = array( 'pm.meta_value' );
+		$where  = array();
+		if ( $course_id ) {
+			$where['p.ID'] = is_array( $course_id ) ? array( 'IN', $course_id ) : $course_id;
+		}
+
+		$search   = array();
+		$limit    = 0; // Get all.
+		$offset   = 0;
+		$order_by = '';
+
+		$results = QueryHelper::get_joined_data(
+			$primary_table,
+			$joining_tables,
+			$select,
+			$where,
+			$search,
+			$order_by,
+			$limit,
+			$offset
+		)['results'];
+
+		if ( $results ) {
+			foreach ( $results as $row ) {
+				$attachment_ids = maybe_unserialize( $row->meta_value );
+				if ( ! is_array( $attachment_ids ) || empty( $attachment_ids ) ) {
+					continue;
+				}
+
+				$attachments = get_posts(
+					array(
+						'post_type'      => 'attachment',
+						'post__in'       => $attachment_ids,
+						'posts_per_page' => -1,
+					)
+				);
+
+				$total_count += count( $attachments );
+			}
+		}
+
+		return $total_count;
+	}
+
+	/**
+	 * Count total questions available in all or specific courses
+	 *
+	 * @since 3.7.1
+	 *
+	 * @param int|array $course_id Course id or array of ids, to get course's attachment.
+	 *
+	 * @return int
+	 */
+	public static function count_questions( $course_id = 0 ) {
+		global $wpdb;
+
+		$total_count      = 0;
+		$quiz_post_type   = tutor()->quiz_post_type;
+		$topic_post_type  = tutor()->topics_post_type;
+		$course_post_type = tutor()->course_post_type;
+
+		$primary_table = "{$wpdb->prefix}tutor_quiz_questions question";
+
+		$joining_tables = array(
+			array(
+				'type'  => 'INNER',
+				'table' => "{$wpdb->posts} q",
+				'on'    => "q.ID = question.quiz_id AND q.post_type='{$quiz_post_type}'",
+			),
+			array(
+				'type'  => 'INNER',
+				'table' => "{$wpdb->posts} t",
+				'on'    => "q.post_parent = t.ID AND t.post_type='{$topic_post_type}'",
+			),
+			array(
+				'type'  => 'INNER',
+				'table' => "{$wpdb->posts} c",
+				'on'    => "c.ID = t.post_parent AND c.post_type='{$course_post_type}'",
+			),
+		);
+
+		// Prepare query.
+		$where = array();
+		if ( $course_id ) {
+			$where['c.ID'] = is_array( $course_id ) ? array( 'IN', $course_id ) : $course_id;
+		}
+
+		$search = array();
+
+		$total_count = QueryHelper::get_joined_count(
+			$primary_table,
+			$joining_tables,
+			$where,
+			$search,
+			'*'
+		);
+
+		return $total_count;
+	}
+
+	/**
+	 * Count course content
+	 *
+	 * @since 3.6.0
+	 *
+	 * @param string $content_type Content type.
+	 * @param array  $course_ids Course ids.
+	 *
+	 * @return int
+	 */
+	public static function count_course_content( string $content_type, array $course_ids = array() ): int {
+		$total_count = 0;
+		switch ( $content_type ) {
+			case tutor()->lesson_post_type:
+				$total_count = tutor_utils()->get_total_lesson( $course_ids );
+				break;
+			case tutor()->quiz_post_type:
+				$total_count = tutor_utils()->get_total_quiz( $course_ids );
+				break;
+			case tutor()->assignment_post_type:
+				if ( tutor_utils()->is_addon_enabled( 'tutor-assignments' ) ) {
+					$total_count = ( new Assignments( false ) )->get_total_assignment( $course_ids );
+				}
+				break;
+			case 'attachments':
+				$total_count = self::count_attachment( $course_ids );
+				break;
+			case 'questions':
+				$total_count = self::count_questions( $course_ids );
+				break;
+			default:
+				break;
+		}
+
+		return (int) $total_count;
+	}
+
+	/**
+	 * Get course dropdown options
+	 *
+	 * @since 3.7.0
+	 *
+	 * @return array
+	 */
+	public static function get_course_dropdown_options() {
+		$course_options = array(
+			array(
+				'key'   => '',
+				'title' => __( 'All Courses', 'tutor' ),
+			),
+		);
+
+		$courses = current_user_can( 'administrator' ) ? self::get_courses() : self::get_courses_by_instructor();
+		if ( ! empty( $courses ) ) {
+			foreach ( $courses as $course ) {
+				$course_options[] = array(
+					'key'   => $course->ID,
+					'title' => $course->post_title,
+				);
+			}
+		}
+
+		return apply_filters( 'tutor_course_dropdown_options', $course_options );
+	}
+
+	/**
+	 * Get category dropdown options
+	 *
+	 * @since 3.7.0
+	 *
+	 * @return array
+	 */
+	public static function get_category_dropdown_options() {
+		$category_options = array(
+			array(
+				'key'   => '',
+				'title' => __( 'All Categories', 'tutor' ),
+			),
+		);
+
+		$categories = get_terms(
+			array(
+				'taxonomy' => self::COURSE_CATEGORY,
+				'orderby'  => 'term_id',
+				'order'    => 'DESC',
+			)
+		);
+		if ( ! is_wp_error( $categories ) && ! empty( $categories ) ) {
+			foreach ( $categories as $category ) {
+				$category_options[] = array(
+					'key'   => $category->slug,
+					'title' => $category->name,
+				);
+			}
+		}
+
+		return $category_options;
+	}
+
+	/**
+	 * Retrieve all course completion records for a specific course, including meta data.
+	 *
+	 * @since 3.8.1
+	 *
+	 * @param int $course_id The ID of the course.
+	 *
+	 * @return array Array of course completion objects with meta, empty array if none found, or on database error.
+	 */
+	public function get_course_completion_data_by_course_id( int $course_id ): array {
+
+		global $wpdb;
+
+		$where = array(
+			'comment_type'    => self::COURSE_COMPLETED,
+			'comment_post_ID' => $course_id,
+			'comment_agent'   => 'TutorLMSPlugin',
+		);
+
+		$result = QueryHelper::get_all( $wpdb->comments, $where, 'comment_post_ID', -1 );
+
+		if ( empty( $result ) ) {
+			return array();
+		}
+
+		return array_map(
+			function ( $item ) {
+
+				return array(
+					'completion'      => $item,
+					'completion_meta' => get_comment_meta( $item->comment_ID ),
+				);
+			},
+			$result
+		);
+	}
+
+	/**
+	 * Return completed courses by user_id
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param int   $user_id user id.
+	 * @param int   $offset offset.
+	 * @param int   $posts_per_page posts per page.
+	 * @param array $args Args to override the defaults.
+	 *
+	 * @return bool|\WP_Query
+	 */
+	public static function get_completed_courses_by_user( $user_id = 0, $offset = 0, $posts_per_page = -1, $args = array() ) {
+		$user_id    = tutor_utils()->get_user_id( $user_id );
+		$course_ids = tutor_utils()->get_completed_courses_ids_by_user( $user_id, false );
+
+		if ( count( $course_ids ) ) {
+			$course_post_type = tutor()->course_post_type;
+			$course_args      = array(
+				'post_type'      => $course_post_type,
+				'post_status'    => 'publish',
+				'post__in'       => $course_ids,
+				'posts_per_page' => $posts_per_page,
+				'offset'         => $offset,
+				'orderby'        => 'post__in',
+			);
+
+			$args        = apply_filters( 'tutor_get_completed_courses_by_user', $args, $user_id, $course_post_type );
+			$course_args = wp_parse_args( $args, $course_args );
+
+			return new \WP_Query( $course_args );
+		}
+
+		return false;
+	}
+
+	/**
+	 * Get the active course by user
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param int   $user_id user id.
+	 * @param int   $offset offset.
+	 * @param int   $posts_per_page posts per page.
+	 * @param array $args Args to override the defaults.
+	 *
+	 * @return bool|\WP_Query
+	 */
+	public static function get_active_courses_by_user( $user_id = 0, $offset = 0, $posts_per_page = -1, $args = array() ) {
+		$user_id             = tutor_utils()->get_user_id( $user_id );
+		$course_ids          = tutor_utils()->get_completed_courses_ids_by_user( $user_id, false );
+		$enrolled_course_ids = tutor_utils()->get_enrolled_courses_ids_by_user( $user_id, false );
+		$active_courses      = array_diff( $enrolled_course_ids, $course_ids );
+
+		if ( count( $active_courses ) ) {
+			$course_post_type = tutor()->course_post_type;
+			$course_args      = array(
+				'post_type'      => apply_filters( 'tutor_active_courses_post_types', array( $course_post_type ) ),
+				'post_status'    => 'publish',
+				'post__in'       => $active_courses,
+				'posts_per_page' => $posts_per_page,
+				'offset'         => $offset,
+				'orderby'        => 'post__in',
+			);
+
+			$args        = apply_filters( 'tutor_get_active_courses_by_user', $args, $user_id, $course_post_type );
+			$course_args = wp_parse_args( $args, $course_args );
+
+			return new \WP_Query( $course_args );
+		}
+
+		return false;
+	}
+
+	/**
+	 * Get the enrolled courses by user
+	 *
+	 * @since 1.0.0
+	 * @since 2.5.0 $filters param added to query enrolled courses with additional filters.
+	 *
+	 * @since 3.4.0 $filters replaced with $args to override the defaults.
+	 *
+	 * @param integer $user_id user id.
+	 * @param mixed   $post_status post status.
+	 * @param integer $offset offset.
+	 * @param integer $posts_per_page post per page.
+	 * @param array   $args Args to override the defaults.
+	 *
+	 * @return bool|\WP_Query
+	 */
+	public static function get_enrolled_courses_by_user( $user_id = 0, $post_status = 'publish', $offset = 0, $posts_per_page = -1, $args = array() ) {
+		$user_id    = tutor_utils()->get_user_id( $user_id );
+		$course_ids = array_unique( tutor_utils()->get_enrolled_courses_ids_by_user( $user_id, false ) );
+
+		if ( count( $course_ids ) ) {
+			$course_post_type = tutor()->course_post_type;
+			$course_args      = array(
+				'post_type'      => $course_post_type,
+				'post_status'    => $post_status,
+				'post__in'       => $course_ids,
+				'offset'         => $offset,
+				'posts_per_page' => $posts_per_page,
+				'orderby'        => 'post__in',
+			);
+
+			$args        = apply_filters( 'tutor_get_enrolled_courses_by_user', $args, $user_id, $course_post_type );
+			$course_args = wp_parse_args( $args, $course_args );
+
+			$result = new \WP_Query( $course_args );
+
+			if ( is_object( $result ) && is_array( $result->posts ) ) {
+
+				// Sort courses according to the id list.
+				$new_array = array();
+
+				foreach ( $course_ids as $id ) {
+					foreach ( $result->posts as $post ) {
+						if ( $post->ID == $id ) {
+							$new_array[] = $post;
+						}
+					}
+				}
+
+				if ( count( $new_array ) ) {
+					$result->posts = $new_array;
+				}
+			}
+
+			return $result;
+		}
+
+		return false;
+	}
+
+	/**
+	 * Get the number of courses created by an instructor within a given date range.
+	 *
+	 * @since 4.0.0
+	 *
+	 * If no date range is provided, returns the total course count for the instructor.
+	 * Course creation date is determined using the `_wp_old_date` meta value when available; otherwise, the course
+	 * post date is used.
+	 *
+	 * @param string|null $start_date Start date in Y-m-d format.
+	 * @param string|null $end_date   End date in Y-m-d format.
+	 * @param int         $user_id    Course author (user) ID.
+	 *
+	 * @return int Total number of matching courses.
+	 */
+	public static function get_course_count_by_date( $start_date, $end_date, $user_id ) {
+
+		$user_id = tutor_utils()->get_user_id( $user_id );
+
+		if ( empty( $start_date ) && empty( $end_date ) ) {
+			return (int) self::get_courses_by_instructor( $user_id, array( 'publish', 'private' ), 0, PHP_INT_MAX, true );
+		}
+
+		$courses = self::get_courses_by_instructor( $user_id, array( 'publish', 'private' ), 0, PHP_INT_MAX );
+
+		if ( empty( $courses ) ) {
+			return 0;
+		}
+
+		$start_date_timestamp = strtotime( $start_date . ' 00:00:00' );
+		$end_date_timestamp   = strtotime( $end_date . ' 23:59:59' );
+
+		$filtered = array_filter(
+			$courses,
+			function ( $course ) use ( $start_date_timestamp, $end_date_timestamp ) {
+				$creation_date = get_post_meta( $course->ID, '_wp_old_date', true );
+
+				$course_creation_date = empty( $creation_date ) ? strtotime( $course->post_date_gmt ) : strtotime( $creation_date );
+
+				return $start_date_timestamp <= $course_creation_date && $end_date_timestamp >= $course_creation_date;
+			}
+		);
+
+		return count( $filtered );
+	}
+
+	/**
+	 * Get topic-wise progress data for a course and a student.
+	 *
+	 * @since 4.0.0
+	 *
+	 * @param int $course_id   Course ID.
+	 * @param int $student_id Student ID.
+	 *
+	 * @return array[] Topic progress data.
+	 */
+	public static function get_course_progress_details( $course_id, $student_id ) {
+
+		$topics_query = tutor_utils()->get_topics( $course_id );
+		$topic_list   = array();
+
+		if ( empty( $topics_query ) || ! $topics_query->have_posts() ) {
+			return $topic_list;
+		}
+
+		foreach ( $topics_query->posts as $topic_post ) {
+			$topic_id              = (int) $topic_post->ID;
+			$items                 = array();
+			$completion_percentage = tutor_utils()->count_completed_contents_by_topic( $topic_id, $student_id );
+			$contents_query        = tutor_utils()->get_course_contents_by_topic( $topic_id, -1 );
+
+			if ( ! empty( $contents_query ) && $contents_query->have_posts() ) {
+				foreach ( $contents_query->posts as $content_post ) {
+					$items[] = ( new self() )->build_course_progress_item( $content_post, $student_id, $course_id );
+				}
+			}
+
+			$topic_list[] = array(
+				'id'                    => $topic_id,
+				'summary'               => $topic_post->post_content,
+				'title'                 => get_the_title( $topic_id ),
+				'items'                 => $items,
+				'completion_percentage' => $completion_percentage['percentage'] ?? 0,
+			);
+		}
+
+		wp_reset_postdata();
+
+		return $topic_list;
+	}
+
+	/**
+	 * Check if the current user has course content access
+	 *
+	 * @since 4.0.0
+	 *
+	 * @throws InvalidArgumentException If args are invalid.
+	 *
+	 * @param array $args Array of arguments.
+	 *
+	 * `$defaults = array(
+	 *      'current_post_type' => '',
+	 *      'current_post_id'   => 0,
+	 *      'course_id'         => 0,
+	 *      'is_public'         => false,
+	 *      'is_enrolled'       => false,
+	 *  );`.
+	 *
+	 * @return bool
+	 */
+	public static function has_course_content_access( array $args = array() ): bool {
+		if ( User::is_admin() ) {
+			return true;
+		}
+
+		$defaults = array(
+			'current_post_type' => '',
+			'current_post_id'   => 0,
+			'course_id'         => 0,
+			'is_public'         => false,
+			'is_enrolled'       => false,
+		);
+
+		$args = wp_parse_args( $args, $defaults );
+
+		if ( ! $args['course_id'] || ! $args['current_post_id'] || ! $args['current_post_type'] ) {
+			throw new InvalidArgumentException( __( 'Invalid argument passed', 'tutor' ) );
+		}
+
+		$has_access = false;
+		$user_id    = get_current_user_id();
+		switch ( $args['current_post_type'] ) {
+			case tutor()->lesson_post_type:
+				$is_preview = (int) get_post_meta( $args['current_post_id'], Lesson::PREVIEW_META_KEY, true );
+				if ( $args['is_public'] || $is_preview ) {
+					$has_access = true;
+				} elseif ( $args['is_enrolled'] || tutor_utils()->has_enrolled_content_access( 'lesson' ) ) {
+					$has_access = true;
+				}
+				break;
+			case tutor()->quiz_post_type:
+			case tutor()->assignment_post_type:
+				if ( $user_id ) {
+					$content_type = tutor()->quiz_post_type === $args['current_post_type'] ? 'quiz' : 'assignment';
+					if ( $args['is_enrolled'] || $args['is_public'] || tutor_utils()->has_enrolled_content_access( $content_type ) ) {
+						$has_access = true;
+					}
+				}
+				break;
+			default:
+				if ( $args['is_enrolled'] ) {
+					$has_access = true;
+				}
+				break;
+		}
+
+		return apply_filters( 'tutor_course_content_access', $has_access, $args );
+	}
+
+	/**
+	 * Build course progress item data for a specific lesson, quiz, assignment, or meeting.
+	 *
+	 * @since 4.0.0
+	 *
+	 * @param \WP_Post $post    The course content post object.
+	 * @param int      $user_id The user ID for whom progress is being calculated.
+	 * @param int      $course_id The course ID to which the content belongs.
+	 *
+	 * @return array Associative array of progress item data
+	 */
+	private function build_course_progress_item( \WP_Post $post, $user_id, $course_id ) {
+
+		$base_items = array(
+			'id'    => $post->ID,
+			'type'  => $post->post_type,
+			'link'  => esc_url_raw( get_permalink( $post->ID ) ),
+			'title' => $post->post_title,
+		);
+
+		switch ( $post->post_type ) {
+			case tutor()->quiz_post_type:
+				$quiz_status  = '';
+				$icon_name    = Icon::QUIZ_2;
+				$icon_class   = 'tutor-text-subdued';
+				$last_attempt = ( new QuizModel() )->get_first_or_last_attempt( $post->ID, $user_id );
+
+				if ( is_object( $last_attempt ) && QuizModel::ATTEMPT_STARTED !== $last_attempt->attempt_status ) {
+					$quiz_status = QuizModel::get_quiz_result( $post->ID, $user_id );
+
+					$quiz_icon_map = array(
+						QuizModel::RESULT_FAIL    => array( Icon::CROSS_COLORIZE, 'tutor-icon-critical' ),
+						QuizModel::RESULT_PENDING => array( Icon::INFO_COLORIZE, 'tutor-icon-warning-secondary' ),
+					);
+
+					if ( isset( $quiz_icon_map[ $quiz_status ] ) ) {
+						list( $icon_name, $icon_class ) = $quiz_icon_map[ $quiz_status ];
+					}
+				}
+
+				return array_merge(
+					$base_items,
+					array(
+						'is_completed' => QuizModel::RESULT_PASS === $quiz_status,
+						'label'        => __( 'Quiz', 'tutor' ),
+						'icon'         => $icon_name,
+						'icon_class'   => $icon_class,
+					)
+				);
+
+			case tutor()->assignment_post_type:
+				$status = '';
+
+				$is_submitted = tutor_utils()->is_assignment_submitted( $post->ID, $user_id );
+				$status       = $is_submitted ? Assignments::get_assignment_result( $post->ID, $user_id ) : $status;
+
+				if ( ! $is_submitted && Assignments::is_expired( $post->ID, $user_id, $course_id ) ) {
+					$status = 'fail';
+				}
+
+				$icon       = Icon::BOOK_2;
+				$icon_class = 'tutor-text-subdued';
+
+				$status_map = array(
+					'pending' => array( Icon::INFO_COLORIZE, 'tutor-icon-warning-secondary' ),
+					'fail'    => array( Icon::CROSS_COLORIZE, 'tutor-icon-critical' ),
+				);
+
+				if ( isset( $status_map[ $status ] ) ) {
+					list( $icon, $icon_class ) = $status_map[ $status ];
+				}
+
+				return array_merge(
+					$base_items,
+					array(
+						'is_completed' => 'pass' === $status,
+						'label'        => __( 'Assignment', 'tutor' ),
+						'icon'         => $icon,
+						'icon_class'   => $icon_class,
+					)
+				);
+
+			case tutor()->zoom_post_type:
+				if ( ! tutor_utils()->is_addon_enabled( 'tutor-zoom' ) ) {
+					return $base_items;
+				}
+
+				return array_merge(
+					$base_items,
+					array(
+						'label'        => __( 'Zoom', 'tutor' ),
+						'icon'         => Icon::ZOOM,
+						'is_completed' => \TUTOR_ZOOM\Zoom::is_zoom_lesson_done( '', $post->ID, $user_id ),
+					)
+				);
+
+			case tutor()->meet_post_type:
+				if ( ! tutor_utils()->is_addon_enabled( 'google-meet' ) ) {
+					return $base_items;
+				}
+
+				return array_merge(
+					$base_items,
+					array(
+						'label'        => __( 'Google Meet', 'tutor' ),
+						'icon'         => Icon::GOOGLE_MEET,
+						'is_completed' => \TutorPro\GoogleMeet\Frontend\Frontend::is_lesson_completed( false, $post->ID, $user_id ),
+					)
+				);
+
+			default:
+				$video = tutor_utils()->get_video_info( $post->ID );
+
+				return array_merge(
+					$base_items,
+					array(
+						'video'           => $video,
+						'video_play_time' => isset( $video->playtime ) ? $video->playtime : '',
+						'is_completed'    => (bool) tutor_utils()->is_completed_lesson( $post->ID, $user_id ),
+						'label'           => empty( $video ) ? __( 'Reading', 'tutor' ) : __( 'Video', 'tutor' ),
+						'icon'            => empty( $video ) ? Icon::COURSES : Icon::VIDEO_CAMERA,
+					)
+				);
+		}
+	}
+
+	/**
+	 * Calculate the total course duration for a set of courses and returns the total time in hours, minutes, and
+	 * seconds.
+	 *
+	 * @since 4.0.0
+	 *
+	 * @param array<int> | int $course_ids List of course IDs or a single course ID.
+	 *
+	 * @return array{
+	 *     hours: int,
+	 *     minutes: int,
+	 *     seconds: int
+	 * } Total accumulated duration from all given courses.
+	 */
+	public static function get_total_course_duration( $course_ids ): array {
+		$total_seconds = 0;
+		$course_ids    = is_array( $course_ids ) ? $course_ids : array( $course_ids );
+		foreach ( $course_ids as $id ) {
+			$total_seconds += self::get_course_duration_in_seconds( $id );
+		}
+
+		return DateTimeHelper::split_seconds_into_time_units( $total_seconds );
+	}
+
+	/**
+	 * Calculate the estimated time spent on courses based on completion progress.
+	 *
+	 * @since 4.0.0
+	 *
+	 * @param array<int> $course_ids List of course IDs.
+	 *
+	 * @return array{
+	 *     hours: int,
+	 *     minutes: int,
+	 *     seconds: int
+	 * } Total accumulated duration from all given courses.
+	 */
+	public static function get_total_estimated_time_spent( $course_ids ): array {
+		$total_seconds = 0;
+		foreach ( $course_ids as $id ) {
+			$completion_percentage = tutor_utils()->is_completed_course( $id )
+										? 100
+										: (int) tutor_utils()->get_course_completed_percent( (int) $id );
+
+			if ( 0 === $completion_percentage ) {
+				continue;
+			}
+			$course_duration_in_seconds = self::get_course_duration_in_seconds( $id );
+			// Calculate the time spent by a user based on the course completion percentage.
+			$total_seconds += (int) round( $course_duration_in_seconds * ( $completion_percentage / 100 ) );
+		}
+
+		return DateTimeHelper::split_seconds_into_time_units( $total_seconds );
+	}
+
+	/**
+	 * Get the total duration of a course in seconds.
+	 *
+	 * @since 4.0.0
+	 *
+	 * @param int $course_id Course ID.
+	 *
+	 * @return int Course duration in seconds.
+	 */
+	public static function get_course_duration_in_seconds( int $course_id ): int {
+		$duration = tutor_utils()->get_course_duration( $course_id, true );
+
+		return ( $duration['durationHours'] * HOUR_IN_SECONDS )
+			+ ( $duration['durationMinutes'] * MINUTE_IN_SECONDS )
+			+ ( $duration['durationSeconds'] );
+	}
+
+	/**
+	 * Update the post_author of a course's content (topics, lessons,
+	 * quizzes and assignments) to a given user.
+	 *
+	 * @since 4.0.3
+	 *
+	 * @param int $course_id course id.
+	 * @param int $author_id new author (user) id.
+	 *
+	 * @return bool
+	 */
+	public static function update_course_content_author( int $course_id, int $author_id ): bool {
+		global $wpdb;
+
+		$content_ids = get_posts(
+			array(
+				'post_parent'    => $course_id,
+				'post_type'      => tutor()->topics_post_type,
+				'fields'         => 'ids',
+				'posts_per_page' => -1,
+				'post_status'    => 'any',
+			)
+		);
+
+		$content_ids        = is_array( $content_ids ) ? $content_ids : array();
+		$default_post_types = array( tutor()->lesson_post_type, tutor()->quiz_post_type );
+		$content_post_types = array_unique( apply_filters( 'tutor_course_contents_post_types', $default_post_types ) );
+
+		$primary_table = 'posts as course';
+		$topic_table   = 'posts as topic';
+		$content_table = 'posts as content';
+
+		$joined_data = QueryHelper::get_joined_data(
+			$primary_table,
+			array(
+				array(
+					'type'  => 'INNER',
+					'table' => $topic_table,
+					'on'    => 'course.ID = topic.post_parent',
+				),
+				array(
+					'type'  => 'INNER',
+					'table' => $content_table,
+					'on'    => 'topic.ID = content.post_parent',
+				),
+			),
+			array( 'content.ID' ),
+			array(
+				'course.ID'         => $course_id,
+				'content.post_type' => array( 'IN', $content_post_types ),
+			),
+			array(),
+			'',
+			-1
+		);
+
+		$content_ids = array_merge( $content_ids, wp_list_pluck( $joined_data['results'], 'ID' ) );
+		$content_ids = array_filter( array_unique( array_map( 'absint', $content_ids ) ) );
+
+		if ( empty( $content_ids ) ) {
+			return false;
+		}
+
+		return (bool) QueryHelper::update_where_in(
+			$wpdb->posts,
+			array( 'post_author' => $author_id ),
+			implode( ',', $content_ids )
+		);
+	}
+}

@@ -1,0 +1,268 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "gutenkit-pro/popup-builder",
+	"version": "1.0.0",
+	"title": "Popup Builder",
+	"category": "gutenkit",
+	"keywords": [
+		"gkit",
+		"gutenkit",
+		"gutenkit pro",
+		"popup",
+		"popup builder",
+		"popup block"
+	],
+	"description": "Popup block for Gutenkit Pro.",
+	"example": {
+		"attributes": {
+			"preview": true
+		}
+	},
+	"attributes": {
+		"blockID": {
+			"type": "string"
+		},
+		"blockClass": {
+			"type": "string"
+		},
+		"blocksCSS": {
+			"type": "object"
+		},
+		"postId": {
+			"type": "number"
+		},
+		"variationSeleted": {
+			"type": "boolean",
+			"default": false
+		},
+		"entrAnimation": {
+			"type": "string",
+			"default": "fadeIn"
+		},
+		"exitAnimation": {
+			"type": "string",
+			"default": "fadeIn"
+		},
+		"openTrigger": {
+			"type": "string",
+			"default": "none"
+		},
+		"pageLoadDelay": {
+			"type": "number",
+			"default": 1
+		},
+		"scrolledToValue": {
+			"type": "number",
+			"default": 30
+		},
+		"userInactivityTime": {
+			"type": "number",
+			"default": 3
+		},
+		"onDateValue": {
+			"type": "string"
+		},
+		"animationDuration": {
+			"type": "number",
+			"default": 0.5
+		},
+		"containerWidthDesktop": {
+			"type": "object"
+		},
+		"containerWidthTablet": {
+			"type": "object"
+		},
+		"containerWidthMobile": {
+			"type": "object"
+		},
+		"containerCustomHeightDesktop": {
+			"type": "object"
+		},
+		"containerCustomHeightTablet": {
+			"type": "object"
+		},
+		"containerCustomHeightMobile": {
+			"type": "object"
+		},
+		"containerHeight": {
+			"type": "string",
+			"default": "auto"
+		},
+		"contentPosition": {
+			"type": "string"
+		},
+		"containerHorPositionDesktop": {
+			"type": "string"
+		},
+		"containerHorPositionTablet": {
+			"type": "string"
+		},
+		"containerHorPositionMobile": {
+			"type": "string"
+		},
+		"containerVerPositionDesktop": {
+			"type": "string"
+		},
+		"containerVerPositionTablet": {
+			"type": "string"
+		},
+		"containerVerPositionMobile": {
+			"type": "string"
+		},
+		"containerBg": {
+			"type": "object"
+		},
+		"containerPaddingDesktop": {
+			"type": "object"
+		},
+		"containerPaddingTablet": {
+			"type": "object"
+		},
+		"containerPaddingMobile": {
+			"type": "object"
+		},
+		"containerBorder": {
+			"type": "object"
+		},
+		"containerBorderRadiusDesktop": {
+			"type": "object"
+		},
+		"containerBorderRadiusTablet": {
+			"type": "object"
+		},
+		"containerBorderRadiusMobile": {
+			"type": "object"
+		},
+		"containerBoxShadow": {
+			"type": "object",
+			"default": {
+				"horizontal": {
+					"size": 2
+				},
+				"vertical": {
+					"size": 8
+				},
+				"blur": {
+					"size": 23
+				},
+				"spread": {
+					"size": 3
+				},
+				"color": "#00000033",
+				"hasValue": true
+			}
+		},
+		"popupStyles": {
+			"type": "object"
+		},
+		"useOverlay": {
+			"type": "boolean",
+			"default": true
+		},
+		"outsideClose": {
+			"type": "boolean",
+			"default": false
+		},
+		"overlayBg": {
+			"type": "object",
+			"default": {
+				"backgroundType": "classic",
+				"backgroundColor": "#00000020"
+			}
+		},
+		"useCloseButton": {
+			"type": "boolean",
+			"default": true
+		},
+		"useCloseButtonIcon": {
+			"type": "boolean",
+			"default": false
+		},
+		"useCustomPosition": {
+			"type": "boolean",
+			"default": false
+		},
+		"closeButtonIcon": {
+			"type": "object",
+			"default": {
+				"title": "cancel",
+				"src": "<svg version=\"1.1\" xmlns=\"http://www.w3.org/2000/svg\" width=\"32\" height=\"32\" viewBox=\"0 0 32 32\">\n<title>cancel</title>\n<path d=\"M18.556 16.027l12.169-12.169c0.706-0.706 0.706-1.85 0-2.555s-1.851-0.706-2.555 0l-12.169 12.169-12.167-12.169c-0.705-0.706-1.85-0.706-2.555 0s-0.706 1.85 0 2.555l12.167 12.169-12.915 12.915c-0.706 0.706-0.706 1.85 0 2.555 0.352 0.353 0.815 0.53 1.278 0.53s0.925-0.176 1.278-0.53l12.915-12.915 12.915 12.915c0.353 0.353 0.815 0.53 1.278 0.53s0.924-0.176 1.278-0.53c0.706-0.706 0.706-1.85 0-2.555l-12.915-12.915z\"></path>\n</svg>\n"
+			},
+			"excludeCopy": true
+		},
+		"closeButtonColor": {
+			"type": "string"
+		},
+		"closeButtonColorHover": {
+			"type": "string"
+		},
+		"closeButtonSize": {
+			"type": "object"
+		},
+		"closeButtonBg": {
+			"type": "string"
+		},
+		"closeButtonBgHover": {
+			"type": "string"
+		},
+		"closeButtonBorder": {
+			"type": "object"
+		},
+		"closeButtonBorderRadiusDesktop": {
+			"type": "object"
+		},
+		"closeButtonBorderRadiusTablet": {
+			"type": "object"
+		},
+		"closeButtonBorderRadiusMobile": {
+			"type": "object"
+		},
+		"closeButtonVerticalPositionDesktop": {
+			"type": "object"
+		},
+		"closeButtonVerticalPositionTablet": {
+			"type": "object"
+		},
+		"closeButtonVerticalPositionMobile": {
+			"type": "object"
+		},
+		"closeButtonHorizontalPositionDesktop": {
+			"type": "object"
+		},
+		"closeButtonHorizontalPositionTablet": {
+			"type": "object"
+		},
+		"closeButtonHorizontalPositionMobile": {
+			"type": "object"
+		},
+		"closeButtonSizeDesktop": {
+			"type": "object"
+		},
+		"closeButtonSizeTablet": {
+			"type": "object"
+		},
+		"closeButtonSizeMobile": {
+			"type": "object"
+		},
+		"closeButtonPaddingDesktop": {
+			"type": "object"
+		},
+		"closeButtonPaddingTablet": {
+			"type": "object"
+		},
+		"closeButtonPaddingMobile": {
+			"type": "object"
+		}
+	},
+	"supports": {
+		"html": false,
+		"anchor": true,
+		"align": [ "wide", "full" ]
+	},
+	"textdomain": "gutenkit-blocks-addon-pro",
+	"editorScript": "file:./index.js",
+	"editorStyle": "file:./index.css",
+	"style": "file:./style-index.css",
+	"viewScript": "file:./frontend.js"
+}

@@ -1,0 +1,319 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "popup-builder-block/button",
+  "version": "1.0.0",
+  "title": "Button",
+  "category": "popup-builder-block",
+  "icon": "smiley",
+  "keywords": [
+    "button",
+    "call",
+    "call button",
+    "popupkit",
+    "popup-builder-block"
+  ],
+  "description": "Button block for gutenberg.",
+  "example": {
+    "preview": true
+  },
+  "attributes": {
+    "blockID": {
+      "type": "string"
+    },
+    "blockClass": {
+      "type": "string"
+    },
+    "blocksCSS": {
+      "type": "object"
+    },
+    "btnText": {
+      "type": "string",
+      "default": "Subscribe Now",
+      "excludeCopy": true
+    },
+    "url": {
+      "type": "object",
+      "default": {
+        "url": "#"
+      },
+      "excludeCopy": true
+    },
+    "alignDesktop": {
+      "type": "string"
+    },
+    "alignTablet": {
+      "type": "string"
+    },
+    "alignMobile": {
+      "type": "string"
+    },
+    "alignTabletLandscape": {
+      "type": "string"
+    },
+    "alignMobileLandscape": {
+      "type": "string"
+    },
+    "alignLaptop": {
+      "type": "string"
+    },
+    "alignWideScreen": {
+      "type": "string"
+    },
+    "widthDesktop": {
+      "type": "object"
+    },
+    "widthTablet": {
+      "type": "object"
+    },
+    "widthMobile": {
+      "type": "object"
+    },
+    "widthTabletLandscape": {
+      "type": "object"
+    },
+    "widthMobileLandscape": {
+      "type": "object"
+    },
+    "widthLaptop": {
+      "type": "object"
+    },
+    "widthWideScreen": {
+      "type": "object"
+    },
+    "textPaddingDesktop": {
+      "type": "object",
+      "default": {
+        "top": "14px",
+        "right": "22px",
+        "bottom": "14px",
+        "left": "22px"
+      }
+    },
+    "textPaddingTablet": {
+      "type": "object"
+    },
+    "textPaddingMobile": {
+      "type": "object"
+    },
+    "textPaddingTabletLandscape": {
+      "type": "object"
+    },
+    "textPaddingMobileLandscape": {
+      "type": "object"
+    },
+    "textPaddingLaptop": {
+      "type": "object"
+    },
+    "textPaddingWideScreen": {
+      "type": "object"
+    },
+    "btnMarginDesktop": {
+      "type": "object"
+    },
+    "btnMarginTablet": {
+      "type": "object"
+    },
+    "btnMarginMobile": {
+      "type": "object"
+    },
+    "btnMarginTabletLandscape": {
+      "type": "object"
+    },
+    "btnMarginMobileLandscape": {
+      "type": "object"
+    },
+    "btnMarginLaptop": {
+      "type": "object"
+    },
+    "btnMarginWideScreen": {
+      "type": "object"
+    },
+    "typography": {
+      "type": "object",
+      "default": {
+        "fontSize": {
+          "Desktop": {
+            "size": 14,
+            "unit": "px"
+          }
+        }
+      }
+    },
+    "shadow": {
+      "type": "object"
+    },
+    "textColor": {
+      "type": "string",
+      "default": "#fff"
+    },
+    "bgColor": {
+      "type": "object",
+      "default": {
+        "backgroundType": "classic",
+        "backgroundColor": "#2575fc"
+      }
+    },
+    "hoverColor": {
+      "type": "string"
+    },
+    "bgHoverColor": {
+      "type": "object",
+      "default": {
+        "backgroundType": "classic",
+        "backgroundColor": "#0069d9"
+      }
+    },
+    "backgroundHoverTransformY": {
+      "type": "object"
+    },
+    "backgroundHoverTransformX": {
+      "type": "object"
+    },
+    "borderDesktop": {
+      "type": "object"
+    },
+    "borderTablet": {
+      "type": "object"
+    },
+    "borderMobile": {
+      "type": "object"
+    },
+    "borderTabletLandscape": {
+      "type": "object"
+    },
+    "borderMobileLandscape": {
+      "type": "object"
+    },
+    "borderLaptop": {
+      "type": "object"
+    },
+    "borderWideScreen": {
+      "type": "object"
+    },
+    "borderRadiusDesktop": {
+      "type": "object",
+      "default": {
+        "top": "5px",
+        "right": "5px",
+        "bottom": "5px",
+        "left": "5px"
+      }
+    },
+    "borderRadiusTablet": {
+      "type": "object"
+    },
+    "borderRadiusMobile": {
+      "type": "object"
+    },
+    "borderRadiusTabletLandscape": {
+      "type": "object"
+    },
+    "borderRadiusMobileLandscape": {
+      "type": "object"
+    },
+    "borderRadiusLaptop": {
+      "type": "object"
+    },
+    "borderRadiusWideScreen": {
+      "type": "object"
+    },
+    "hoverBorderDesktop": {
+      "type": "object"
+    },
+    "hoverBorderTablet": {
+      "type": "object"
+    },
+    "hoverBorderMobile": {
+      "type": "object"
+    },
+    "hoverBorderTabletLandscape": {
+      "type": "object"
+    },
+    "hoverBorderMobileLandscape": {
+      "type": "object"
+    },
+    "hoverBorderLaptop": {
+      "type": "object"
+    },
+    "hoverBorderWideScreen": {
+      "type": "object"
+    },
+    "hoverBorderRadiusDesktop": {
+      "type": "object"
+    },
+    "hoverBorderRadiusTablet": {
+      "type": "object"
+    },
+    "hoverBorderRadiusMobile": {
+      "type": "object"
+    },
+    "hoverBorderRadiusTabletLandscape": {
+      "type": "object"
+    },
+    "hoverBorderRadiusMobileLandscape": {
+      "type": "object"
+    },
+    "hoverBorderRadiusLaptop": {
+      "type": "object"
+    },
+    "hoverBorderRadiusWideScreen": {
+      "type": "object"
+    },
+    "boxShadowGroup": {
+      "type": "object"
+    },
+    "boxShadowGroupHover": {
+      "type": "object"
+    },
+    "onClickAction": {
+      "type": "string",
+      "default": "none"
+    },
+    "openCampaign": {
+      "type": "object"
+    },
+    "closeCampaign": {
+      "type": "object"
+    },
+    "istrackConversion": {
+      "type": "boolean",
+      "default": false
+    },
+    "iconsSwitch": {
+      "type": "boolean",
+      "default": false,
+      "excludeCopy": true
+    },
+    "buttonIcon": {
+      "type": "object",
+      "default": {}
+    },
+    "iconPosition": {
+      "type": "string",
+      "default": "before"
+    },
+    "betweenSpace": {
+      "type": "object"
+    },
+    "buttonIconColor": {
+      "type": "string"
+    },
+    "buttonHoverIconColor": {
+      "type": "string"
+    }
+  },
+  "supports": {
+    "html": false,
+    "align": [
+      "wide",
+      "full"
+    ],
+    "anchor": true
+  },
+  "textdomain": "popup-builder-block",
+  "editorScript": "file:./index.js",
+  "editorStyle": "file:./index.css",
+  "style": "file:./style-index.css",
+  "viewScript": "file:./frontend.js"
+}

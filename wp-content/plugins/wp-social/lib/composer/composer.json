@@ -1,0 +1,6 @@
+{
+    "require": {
+        "hybridauth/hybridauth": "^3.11.0",
+        "phpseclib/phpseclib": "^3.0"
+    }
+}

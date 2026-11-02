@@ -1,0 +1,737 @@
+{
+  "content": [
+    {
+      "id": "1826bca",
+      "settings": {
+        "_column_size": 100,
+        "flex_gap": {
+          "size": 40,
+          "column": "40",
+          "row": "40",
+          "unit": "px",
+          "isLinked": true
+        },
+        "padding": {
+          "unit": "px",
+          "top": "40",
+          "right": "50",
+          "bottom": "50",
+          "left": "50",
+          "isLinked": false
+        },
+        "ekit_all_conditions_list": [
+          {
+            "_id": "2911435"
+          }
+        ],
+        "flex_direction": "column",
+        "flex_justify_content": "space-between",
+        "flex_align_items": "flex-start",
+        "flex_gap_tablet": {
+          "column": "24",
+          "row": "24",
+          "isLinked": true,
+          "unit": "px",
+          "size": 24
+        },
+        "flex_wrap": "wrap",
+        "metform_multistep_settings_title": "",
+        "metform_multistep_settings_icon": {
+          "value": "",
+          "library": ""
+        },
+        "background_color": "#ffffff",
+        "box_shadow_box_shadow": {
+          "horizontal": 0,
+          "vertical": 30,
+          "blur": 50,
+          "spread": 0,
+          "color": "rgba(3.0000000000000053, 12.000000000000005, 35, 0.08)"
+        },
+        "padding_tablet": {
+          "unit": "px",
+          "top": "50",
+          "right": "15",
+          "bottom": "50",
+          "left": "15",
+          "isLinked": false
+        }
+      },
+      "elements": [
+        {
+          "id": "7b10661f",
+          "settings": {
+            "title": "Conditional Logic Quiz",
+            "title_color": "#0D1427",
+            "typography_typography": "custom",
+            "typography_font_family": "IBM Plex Sans",
+            "typography_font_size": {
+              "unit": "px",
+              "size": 26,
+              "sizes": []
+            },
+            "typography_font_weight": "700",
+            "typography_line_height": {
+              "unit": "px",
+              "size": 34,
+              "sizes": []
+            },
+            "typography_line_height_tablet": {
+              "unit": "px",
+              "size": "",
+              "sizes": []
+            },
+            "typography_line_height_mobile": {
+              "unit": "px",
+              "size": "",
+              "sizes": []
+            },
+            "_padding": {
+              "unit": "px",
+              "top": "0",
+              "right": "0",
+              "bottom": "0",
+              "left": "0",
+              "isLinked": true
+            },
+            "ekit_all_conditions_list": [
+              {
+                "_id": "63c841d"
+              }
+            ],
+            "ekit_adv_tooltip_content": "Tooltip Content.",
+            "_padding_mobile": {
+              "unit": "px",
+              "top": "0",
+              "right": "0",
+              "bottom": "10",
+              "left": "0",
+              "isLinked": false
+            },
+            "_element_width": "inherit",
+            "_margin": {
+              "unit": "px",
+              "top": "0",
+              "right": "0",
+              "bottom": "-20",
+              "left": "0",
+              "isLinked": false
+            }
+          },
+          "elements": [],
+          "isInner": false,
+          "widgetType": "heading",
+          "elType": "widget"
+        },
+        {
+          "id": "784d7178",
+          "settings": {
+            "title": "Customer Communication and Booking Strategies",
+            "title_color": "#54565C",
+            "typography_typography": "custom",
+            "typography_font_family": "IBM Plex Sans",
+            "typography_font_size": {
+              "unit": "px",
+              "size": 16,
+              "sizes": []
+            },
+            "typography_font_weight": "normal",
+            "_margin": {
+              "unit": "px",
+              "top": "0",
+              "right": "0",
+              "bottom": "0",
+              "left": "0",
+              "isLinked": false
+            }
+          },
+          "elements": [],
+          "isInner": false,
+          "widgetType": "heading",
+          "elType": "widget"
+        },
+        {
+          "id": "10d9cb1c",
+          "settings": {
+            "structure": "20",
+            "ekit_section_parallax_multi_items": [],
+            "content_width": "full",
+            "ekit_all_conditions_list": [
+              {
+                "_id": "7fd08b3"
+              }
+            ],
+            "flex_direction": "row",
+            "flex_align_items": "stretch",
+            "flex_gap": {
+              "size": 10,
+              "column": "10",
+              "row": "10",
+              "unit": "px"
+            },
+            "container_type": "grid",
+            "grid_rows_grid": {
+              "unit": "fr",
+              "size": 1,
+              "sizes": []
+            },
+            "grid_gaps": {
+              "column": "15",
+              "row": "40",
+              "isLinked": false,
+              "unit": "px"
+            },
+            "metform_multistep_settings_title": "",
+            "metform_multistep_settings_icon": {
+              "value": "",
+              "library": ""
+            },
+            "padding": {
+              "unit": "px",
+              "top": "0",
+              "right": "0",
+              "bottom": "0",
+              "left": "0",
+              "isLinked": false
+            },
+            "presetTitle": "Grid",
+            "presetIcon": "eicon-container-grid",
+            "grid_gaps_mobile": {
+              "column": "20",
+              "row": "20",
+              "isLinked": true,
+              "unit": "px"
+            },
+            "margin": {
+              "unit": "px",
+              "top": "5",
+              "right": "0",
+              "bottom": "0",
+              "left": "0",
+              "isLinked": false
+            }
+          },
+          "elements": [
+            {
+              "id": "58c8f8e3",
+              "settings": {
+                "mf_input_label": "Name ",
+                "mf_input_placeholder": "First Name",
+                "mf_input_required": "yes",
+                "mf_input_validation_warning_message": "This field is required.",
+                "mf_conditional_logic_form_list": [],
+                "mf_input_label_typography_typography": "custom",
+                "mf_input_label_typography_font_family": "Roboto",
+                "mf_input_label_typography_font_weight": "500",
+                "mf_input_warning_text_typography_typography": "custom",
+                "mf_input_warning_text_typography_font_family": "Roboto",
+                "mf_input_warning_text_typography_font_weight": "600",
+                "mf_input_place_holder_typography_typography": "custom",
+                "mf_input_place_holder_typography_font_family": "IBM Plex Sans Devanagari",
+                "mf_input_place_holder_typography_font_size": {
+                  "unit": "px",
+                  "size": 14,
+                  "sizes": []
+                },
+                "mf_input_place_holder_typography_font_weight": "normal",
+                "__globals__": {
+                  "mf_input_label_typography_typography": "",
+                  "mf_input_place_holder_typography_typography": ""
+                },
+                "mf_input_background_background": "classic",
+                "mf_input_background_color": "#FFFFFF"
+              },
+              "elements": [],
+              "isInner": false,
+              "widgetType": "mf-listing-fname",
+              "elType": "widget"
+            },
+            {
+              "id": "46dac76",
+              "settings": {
+                "mf_input_label": "",
+                "mf_input_name": "mf-last-name",
+                "mf_input_placeholder": "Last name",
+                "mf_input_validation_warning_message": "This field is required.",
+                "mf_conditional_logic_form_list": [],
+                "mf_input_label_padding": {
+                  "unit": "px",
+                  "top": "0",
+                  "right": "0",
+                  "bottom": "0",
+                  "left": "0",
+                  "isLinked": false
+                },
+                "mf_input_place_holder_typography_typography": "custom",
+                "mf_input_place_holder_typography_font_family": "IBM Plex Sans",
+                "mf_input_place_holder_typography_font_size": {
+                  "unit": "px",
+                  "size": 14,
+                  "sizes": []
+                },
+                "mf_input_place_holder_typography_font_weight": "normal",
+                "mf_input_placeholder_color": "#878990",
+                "mf_input_border_radius": {
+                  "unit": "px",
+                  "size": 4,
+                  "sizes": []
+                },
+                "_margin": {
+                  "unit": "px",
+                  "top": "21",
+                  "right": "0",
+                  "bottom": "0",
+                  "left": "0",
+                  "isLinked": false
+                },
+                "_margin_mobile": {
+                  "unit": "px",
+                  "top": "0",
+                  "right": "0",
+                  "bottom": "0",
+                  "left": "0",
+                  "isLinked": true
+                },
+                "mf_input_required": "",
+                "mf_input_label_margin": {
+                  "unit": "px",
+                  "top": "0",
+                  "right": "0",
+                  "bottom": "0",
+                  "left": "3",
+                  "isLinked": false
+                },
+                "mf_input_background_background": "classic",
+                "mf_input_background_color": "#FFFFFF",
+                "_margin_tablet": {
+                  "unit": "px",
+                  "top": "21",
+                  "right": "0",
+                  "bottom": "0",
+                  "left": "0",
+                  "isLinked": false
+                }
+              },
+              "elements": [],
+              "isInner": false,
+              "widgetType": "mf-text",
+              "elType": "widget"
+            },
+            {
+              "id": "13b4e68d",
+              "settings": {
+                "mf_input_label": "Date",
+                "mf_input_name": "mf-date",
+                "mf_input_placeholder": "DD - MM - YYYY",
+                "mf_input_validation_warning_message": "This field is required.",
+                "mf_input_disable_date_list": [],
+                "mf_conditional_logic_form_list": [],
+                "mf_input_label_typography_typography": "custom",
+                "mf_input_label_typography_font_family": "Roboto",
+                "mf_input_label_typography_font_weight": "500",
+                "mf_input_place_holder_typography_typography": "custom",
+                "mf_input_place_holder_typography_font_family": "IBM Plex Sans Devanagari",
+                "mf_input_place_holder_typography_font_size": {
+                  "unit": "px",
+                  "size": 14,
+                  "sizes": []
+                },
+                "mf_input_place_holder_typography_font_weight": "normal",
+                "mf_input_warning_text_typography_typography": "custom",
+                "mf_input_warning_text_typography_font_family": "Roboto",
+                "mf_input_warning_text_typography_font_weight": "600",
+                "mf_input_background_background": "classic",
+                "mf_input_background_color": "#FFFFFF",
+                "__globals__": {
+                  "mf_input_label_typography_typography": "",
+                  "mf_input_place_holder_typography_typography": ""
+                }
+              },
+              "elements": [],
+              "isInner": false,
+              "widgetType": "mf-date",
+              "elType": "widget"
+            }
+          ],
+          "isInner": true,
+          "elType": "container"
+        },
+        {
+          "id": "412d8ae4",
+          "settings": {
+            "structure": "20",
+            "ekit_section_parallax_multi_items": [],
+            "content_width": "full",
+            "ekit_all_conditions_list": [
+              {
+                "_id": "7fd08b3"
+              }
+            ],
+            "flex_direction": "row",
+            "flex_align_items": "stretch",
+            "flex_gap": {
+              "size": 0,
+              "column": "0",
+              "row": "45",
+              "unit": "px"
+            },
+            "grid_columns_grid": {
+              "unit": "fr",
+              "size": 2,
+              "sizes": []
+            },
+            "grid_rows_grid": {
+              "unit": "fr",
+              "size": 1,
+              "sizes": []
+            },
+            "grid_gaps": {
+              "column": "0",
+              "row": "30",
+              "isLinked": false,
+              "unit": "px"
+            },
+            "grid_gaps_tablet": {
+              "column": "24",
+              "row": "24",
+              "isLinked": true,
+              "unit": "px"
+            },
+            "metform_multistep_settings_title": "",
+            "metform_multistep_settings_icon": {
+              "value": "",
+              "library": ""
+            },
+            "padding": {
+              "unit": "px",
+              "top": "0",
+              "right": "0",
+              "bottom": "0",
+              "left": "0",
+              "isLinked": false
+            },
+            "presetTitle": "Container",
+            "presetIcon": "eicon-container",
+            "flex_wrap": "wrap",
+            "flex_align_items_tablet": "flex-end",
+            "flex_gap_tablet": {
+              "column": "0",
+              "row": "35",
+              "isLinked": false,
+              "unit": "px",
+              "size": 0
+            },
+            "flex_gap_mobile": {
+              "column": "30",
+              "row": "30",
+              "isLinked": true,
+              "unit": "px",
+              "size": 30
+            }
+          },
+          "elements": [
+            {
+              "id": "297a2fa4",
+              "settings": {
+                "mf_input_label": "Select the quiz you would like to take. ",
+                "mf_input_name": "mf-radio",
+                "mf_input_display_option": "block",
+                "mf_input_list": [
+                  {
+                    "mf_input_option_text": "Quiz 1",
+                    "mf_input_option_value": "Quiz 1",
+                    "_id": "1b5235e"
+                  },
+                  {
+                    "mf_input_option_text": "Quiz 3",
+                    "mf_input_option_value": "Quiz 3",
+                    "_id": "5d02d48"
+                  },
+                  {
+                    "mf_input_option_text": "Quiz 5",
+                    "mf_input_option_value": "Quiz 5",
+                    "_id": "9e0ed1b"
+                  },
+                  {
+                    "_id": "b4c8f6d",
+                    "mf_input_option_text": "Quiz 7",
+                    "mf_input_option_value": "Quiz 7"
+                  },
+                  {
+                    "_id": "77f837f",
+                    "mf_input_option_text": "Quiz 9",
+                    "mf_input_option_value": "Quiz 9"
+                  }
+                ],
+                "mf_input_validation_warning_message": "This field is required.",
+                "mf_conditional_logic_form_list": [],
+                "mf_input_label_color": "#0D1427",
+                "mf_input_label_typography_typography": "custom",
+                "mf_input_label_typography_font_family": "IBM Plex Sans",
+                "mf_input_label_typography_font_size": {
+                  "unit": "px",
+                  "size": 16,
+                  "sizes": []
+                },
+                "mf_input_label_typography_font_weight": "500",
+                "mf_input_option_color": "#0D1427",
+                "mf_input_typgraphy_text_typography": "custom",
+                "mf_input_typgraphy_text_font_family": "IBM Plex Sans",
+                "mf_input_typgraphy_text_font_size": {
+                  "unit": "px",
+                  "size": 16,
+                  "sizes": []
+                },
+                "mf_input_typgraphy_text_font_weight": "normal",
+                "mf_input_required": "yes",
+                "mf_input_label_margin": {
+                  "unit": "px",
+                  "top": "0",
+                  "right": "0",
+                  "bottom": "20",
+                  "left": "0",
+                  "isLinked": false
+                },
+                "_element_width": "initial",
+                "_element_width_mobile": "inherit",
+                "_element_custom_width": {
+                  "unit": "%",
+                  "size": 55,
+                  "sizes": []
+                }
+              },
+              "elements": [],
+              "isInner": false,
+              "widgetType": "mf-radio",
+              "elType": "widget"
+            },
+            {
+              "id": "7c69926c",
+              "settings": {
+                "mf_input_label": "",
+                "mf_input_name": "mf-radio",
+                "mf_input_display_option": "block",
+                "mf_input_list": [
+                  {
+                    "mf_input_option_text": "Quiz 2",
+                    "mf_input_option_value": "Quiz 2",
+                    "_id": "d268a7f"
+                  },
+                  {
+                    "mf_input_option_text": "Quiz 4",
+                    "mf_input_option_value": "Quiz 4",
+                    "_id": "4376a76"
+                  },
+                  {
+                    "mf_input_option_text": "Quiz 6",
+                    "mf_input_option_value": "Quiz 6",
+                    "_id": "73737fc"
+                  },
+                  {
+                    "_id": "4755744",
+                    "mf_input_option_text": "Quiz 8",
+                    "mf_input_option_value": "Quiz 8"
+                  },
+                  {
+                    "_id": "90d21bd",
+                    "mf_input_option_text": "Quiz 10",
+                    "mf_input_option_value": "Quiz 10"
+                  }
+                ],
+                "mf_input_validation_warning_message": "This field is required.",
+                "mf_conditional_logic_form_list": [],
+                "mf_input_typgraphy_text_typography": "custom",
+                "mf_input_typgraphy_text_font_family": "IBM Plex Sans",
+                "mf_input_typgraphy_text_font_size": {
+                  "unit": "px",
+                  "size": 16,
+                  "sizes": []
+                },
+                "mf_input_typgraphy_text_font_weight": "normal",
+                "mf_input_label_typography_typography": "custom",
+                "mf_input_label_typography_font_family": "IBM Plex Sans",
+                "mf_input_label_typography_font_weight": "500",
+                "_margin": {
+                  "unit": "px",
+                  "top": "35",
+                  "right": "0",
+                  "bottom": "0",
+                  "left": "-280",
+                  "isLinked": false
+                },
+                "_margin_tablet": {
+                  "unit": "px",
+                  "top": "0",
+                  "right": "0",
+                  "bottom": "0",
+                  "left": "-120",
+                  "isLinked": false
+                },
+                "_margin_mobile": {
+                  "unit": "px",
+                  "top": "-30",
+                  "right": "0",
+                  "bottom": "0",
+                  "left": "0",
+                  "isLinked": false
+                },
+                "mf_input_label_typography_font_size": {
+                  "unit": "px",
+                  "size": 16,
+                  "sizes": []
+                },
+                "mf_input_label_padding_mobile": {
+                  "unit": "px",
+                  "top": "0",
+                  "right": "0",
+                  "bottom": "0",
+                  "left": "0",
+                  "isLinked": false
+                },
+                "mf_input_label_margin_mobile": {
+                  "unit": "px",
+                  "top": "0",
+                  "right": "0",
+                  "bottom": "0",
+                  "left": "0",
+                  "isLinked": false
+                },
+                "_padding": {
+                  "unit": "px",
+                  "top": "0",
+                  "right": "0",
+                  "bottom": "0",
+                  "left": "0",
+                  "isLinked": false
+                },
+                "_element_width": "auto",
+                "_element_width_mobile": "inherit"
+              },
+              "elements": [],
+              "isInner": false,
+              "widgetType": "mf-radio",
+              "elType": "widget"
+            }
+          ],
+          "isInner": true,
+          "elType": "container"
+        },
+        {
+          "id": "7c6784e5",
+          "settings": {
+            "mf_input_label": "If you are not sure what you should be doing when you come in, how would you find your assigned tasks?",
+            "mf_input_name": "mf-textarea",
+            "mf_input_placeholder": "Enter your answer",
+            "mf_input_validation_warning_message": "This field is required.",
+            "mf_conditional_logic_form_list": [],
+            "mf_input_label_typography_typography": "custom",
+            "mf_input_label_typography_font_family": "IBM Plex Sans",
+            "mf_input_label_typography_font_size": {
+              "unit": "px",
+              "size": 16,
+              "sizes": []
+            },
+            "mf_input_label_typography_font_weight": "500",
+            "mf_input_border_radius": {
+              "unit": "px",
+              "size": 4,
+              "sizes": []
+            },
+            "mf_input_place_holder_typography_typography": "custom",
+            "mf_input_place_holder_typography_font_family": "IBM Plex Sans",
+            "mf_input_place_holder_typography_font_size": {
+              "unit": "px",
+              "size": 14,
+              "sizes": []
+            },
+            "mf_input_place_holder_typography_font_weight": "normal",
+            "mf_input_placeholder_color": "#878990",
+            "mf_input_label_color": "#0D1427",
+            "mf_input_label_typography_line_height": {
+              "unit": "px",
+              "size": 20,
+              "sizes": []
+            },
+            "mf_input_label_padding": {
+              "unit": "px",
+              "top": "0",
+              "right": "0",
+              "bottom": "0",
+              "left": "0",
+              "isLinked": false
+            },
+            "mf_input_label_margin": {
+              "unit": "px",
+              "top": "0",
+              "right": "0",
+              "bottom": "20",
+              "left": "0",
+              "isLinked": false
+            },
+            "_element_width": "inherit",
+            "_element_width_mobile": "inherit",
+            "_element_custom_width": {
+              "unit": "%",
+              "size": 55,
+              "sizes": []
+            },
+            "_flex_align_self": "stretch"
+          },
+          "elements": [],
+          "isInner": false,
+          "widgetType": "mf-textarea",
+          "elType": "widget"
+        },
+        {
+          "id": "3e30283c",
+          "settings": {
+            "mf_btn_text": "Submit",
+            "mf_btn_align": "left",
+            "mf_conditional_logic_form_list": [],
+            "mf_hidden_input": [],
+            "mf_btn_text_padding": {
+              "unit": "px",
+              "top": "16",
+              "right": "26",
+              "bottom": "17",
+              "left": "26",
+              "isLinked": false
+            },
+            "mf_btn_box_shadow_group_box_shadow_type": "yes",
+            "mf_btn_box_shadow_group_box_shadow": {
+              "horizontal": 0,
+              "vertical": 0,
+              "blur": 0,
+              "spread": 0,
+              "color": "rgba(0,0,0,0.5)"
+            },
+            "_margin": {
+              "unit": "px",
+              "top": "0",
+              "right": "0",
+              "bottom": "0",
+              "left": "0",
+              "isLinked": true
+            },
+            "_element_width": "initial",
+            "_element_custom_width": {
+              "unit": "%",
+              "size": 100.281
+            },
+            "_flex_size": "none"
+          },
+          "elements": [],
+          "isInner": false,
+          "widgetType": "mf-button",
+          "elType": "widget"
+        }
+      ],
+      "isInner": true,
+      "elType": "container"
+    }
+  ],
+  "page_settings": [],
+  "version": "0.4",
+  "title": "conditional-logic-quiz",
+  "type": "page"
+}
