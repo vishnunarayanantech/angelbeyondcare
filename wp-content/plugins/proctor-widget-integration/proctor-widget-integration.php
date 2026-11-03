@@ -1,8 +1,8 @@
 <?php
 /**
  * Plugin Name: Proctor Widget Integration
- * Description: Initializes and persists the proctoring widget across every lesson and quiz chapter of every Tutor LMS course for enrolled (or admin) users, closing the proctoring session on course completion (or, for admins only, an explicit end-session control).
- * Version: 1.8.0
+ * Description: Initializes and persists the proctoring widget across every lesson and quiz chapter of every Tutor LMS course for enrolled (or admin) users, closing the proctoring session on course completion (or, for admins only, an explicit end-session control), and restarting it on the next chapter visited whenever no session is active.
+ * Version: 1.9.0
  *
  * Session-validity note: the vendor exposes no documented API to check
  * whether a session_id is still valid server-side (only client-side
@@ -22,6 +22,14 @@
  * Proctoring control is restricted to admins (see pwi_can_end_session()) -
  * students are not permitted to end their own session early. This is a
  * deliberate product decision, not an oversight.
+ *
+ * Multiple runs note: a student can be proctored more than once on the same
+ * course - once a session ends (completion, admin end, or 8h idle), the very
+ * next lesson or quiz chapter opened with no active session starts a new one
+ * (see the template_redirect gate below). Each such run gets its own vendor
+ * session_id, distinct from any earlier run on the same course (see
+ * pwi_get_session_id()), so the vendor never sees the same session_id reused
+ * after it was already closed.
  */
 
 if (!defined('ABSPATH')) {
@@ -85,6 +93,18 @@ function pwi_session_meta_key($course_id) {
 }
 
 /**
+ * Separate from pwi_session_meta_key(): that one is a sliding-window
+ * "last activity" timestamp, touched on every chapter view so the 8h idle
+ * timer keeps resetting. This one is written once, only when a session
+ * actually starts, and never touched again until the session ends and a new
+ * one starts - it marks which run is currently active, so pwi_get_session_id()
+ * can give each run its own vendor session_id instead of reusing one forever.
+ */
+function pwi_session_started_meta_key($course_id) {
+    return '_proctor_session_started_' . (int) $course_id;
+}
+
+/**
  * Sliding-window check: a session is only treated as stale after
  * PWI_SESSION_EXPIRY_SECONDS of no lesson activity, not since it first
  * started. Every successful check (i.e. every lesson page load while the
@@ -105,6 +125,7 @@ function pwi_get_active_session($user_id, $course_id, $touch = true) {
     }
     if ((time() - $last_seen) > PWI_SESSION_EXPIRY_SECONDS) {
         delete_user_meta($user_id, $meta_key);
+        delete_user_meta($user_id, pwi_session_started_meta_key($course_id));
         return false;
     }
     if ($touch) {
@@ -114,11 +135,33 @@ function pwi_get_active_session($user_id, $course_id, $touch = true) {
 }
 
 function pwi_start_active_session($user_id, $course_id) {
-    update_user_meta($user_id, pwi_session_meta_key($course_id), time());
+    $now = time();
+    update_user_meta($user_id, pwi_session_meta_key($course_id), $now);
+    update_user_meta($user_id, pwi_session_started_meta_key($course_id), $now);
 }
 
 function pwi_clear_active_session($user_id, $course_id) {
     delete_user_meta($user_id, pwi_session_meta_key($course_id));
+    delete_user_meta($user_id, pwi_session_started_meta_key($course_id));
+}
+
+/**
+ * The vendor session_id/session_id_or_external for the run currently active
+ * (or just-ended, at close time) for this user+course. Includes the run's own
+ * start time so each run gets a distinct id - a student proctored more than
+ * once on the same course never has an earlier, already-closed run's id sent
+ * to the vendor again (see the "Multiple runs note" in the plugin header).
+ *
+ * Back-compat: a session already active from before this id scheme shipped
+ * has no "started" meta yet. Rather than switch that one in-flight session to
+ * a different id mid-run, it falls back to the old id (just user+course) -
+ * only sessions that START after this change get a per-run id.
+ */
+function pwi_get_session_id($user_id, $course_id) {
+    $started_at = (int) get_user_meta($user_id, pwi_session_started_meta_key($course_id), true);
+    return $started_at
+        ? hash('sha256', $user_id . '_' . $course_id . '_' . $started_at)
+        : hash('sha256', $user_id . '_' . $course_id);
 }
 
 /**
@@ -132,7 +175,7 @@ function pwi_close_proctor_session($user_id, $course_id) {
     }
 
     $proctorclosesessionparams = [
-        'session_id_or_external' => hash('sha256', $user_id . '_' . $course_id),
+        'session_id_or_external' => pwi_get_session_id($user_id, $course_id),
         'app_key'                => PWI_APP_KEY,
         'key_id'                 => pwi_get_key_id_for_course($course_id),
     ];
@@ -155,36 +198,19 @@ function pwi_close_proctor_session($user_id, $course_id) {
 }
 
 /**
- * Proctoring only ever starts from a course's first lesson. A course can open
- * with a quiz, so "first" means "no earlier lesson", not "no earlier content" -
- * otherwise such a course would never start a session.
- */
-function pwi_is_first_lesson($lesson) {
-    if (!function_exists('tutor_utils')) {
-        return false;
-    }
-
-    $previous_id = tutor_utils()->get_course_prev_next_contents_by_id($lesson->ID)->previous_id;
-    for ($steps = 0; $previous_id; $steps++) {
-        if ($steps >= 50 || get_post_type($previous_id) === $lesson->post_type) {
-            return false;
-        }
-        $previous_id = tutor_utils()->get_course_prev_next_contents_by_id($previous_id)->previous_id;
-    }
-    return true;
-}
-
-/**
  * Main gate: decide whether to (re)inject the widget on this chapter page.
  * A "chapter" is a lesson or a quiz - the only two content types Tutor LMS
  * itself treats as course contents (see get_course_contents_by_topic() in
  * Tutor's own Utils.php; no other content type is part of its prev/next
  * chain in this install, so there is nothing else a fix needs to cover).
- * Fires on every chapter in the course (not just the first) so the floating
- * monitor reappears after each full-page navigation and keeps running
- * across quiz chapters too, not just lessons - but only ever *starts* a new
- * session from the course's first LESSON, same as before: a quiz that comes
- * before lesson 1 (e.g. a pre-course check) must not start one on its own.
+ * Fires on every chapter in the course so the floating monitor reappears
+ * after each full-page navigation and keeps running across quiz chapters
+ * too, not just lessons. A new session starts on ANY chapter - lesson or
+ * quiz, first or not - whenever none is currently active: that covers a
+ * fresh student's first visit, and just as deliberately lets a student be
+ * proctored again on a course they already finished (or whose session an
+ * admin ended, or that went idle 8h) the moment they open another chapter -
+ * proctoring is not a one-time-only thing for a given student on a course.
  */
 add_action('template_redirect', function () {
     if (!is_singular(['lesson', 'tutor_quiz'])) {
@@ -228,13 +254,6 @@ add_action('template_redirect', function () {
     $has_active_session = false !== pwi_get_active_session($user_id1, $course_id1);
 
     if (!$has_active_session) {
-        if ($content->post_type !== 'lesson' || !pwi_is_first_lesson($content)) {
-            // No active session, and this is either a quiz (proctoring never
-            // starts from a quiz) or a lesson that isn't the starting one
-            // (e.g. a deep link) — proctoring only ever starts from lesson 1.
-            return;
-        }
-
         pwi_start_active_session($user_id1, $course_id1);
     }
 
@@ -248,7 +267,7 @@ function pwi_render_widget_script($course_id1, $course, $user_id1) {
 
     $proctorwidgetparams = [
         'key_id'       => pwi_get_key_id_for_course($course_id1),
-        'session_id'   => hash('sha256', $user_id1 . '_' . $course_id1),
+        'session_id'   => pwi_get_session_id($user_id1, $course_id1),
         'app_key'      => PWI_APP_KEY,
         'course_id'    => $course_id1,
         'course_name'  => $course->post_title,
@@ -635,7 +654,7 @@ function pwi_render_courses_list() {
     <?php if (isset($_GET['pwi_course_keys_saved'])) : ?>
         <div class="notice notice-success is-dismissible"><p>Course Key ID overrides saved.</p></div>
     <?php endif; ?>
-    <p>Proctoring applies to every course below once a student opens its first lesson, using the default Key ID above unless a course has its own Key ID set below.</p>
+    <p>Proctoring applies to every course below from the first lesson or quiz chapter a student opens, restarting automatically each time they return with no proctoring session currently active, using the default Key ID above unless a course has its own Key ID set below.</p>
     <?php if ($count === 0) : ?>
         <p><em>No Tutor LMS courses found yet.</em></p>
     <?php else : ?>
